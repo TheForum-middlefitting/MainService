@@ -1,11 +1,9 @@
 package com.practice.springbasic.domain;
 
-import com.practice.springbasic.domain.dto.MemberUpdateDto;
+import com.practice.springbasic.domain.dto.MemberDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
@@ -70,7 +68,7 @@ class MemberTest {
         em.persist(member);
         Long firstId = member.getId();
 
-        MemberUpdateDto memberUpdateDto = MemberUpdateDto.builder()
+        MemberDto memberUpdateDto = MemberDto.builder()
                 .email(member.getEmail() + '2')
                 .nickname(member.getNickname() + '2')
                 .password(member.getPassword() + '2')
@@ -86,10 +84,10 @@ class MemberTest {
 
     @Test
     public void memberUpdateFail() throws Exception{
-        MemberUpdateDto memberUpdateDtoEx = new MemberUpdateDto("nickname", "email", "password");
+        MemberDto memberUpdateDtoEx = new MemberDto("nickname", "email", "password");
 
         try {
-            MemberUpdateDto memberUpdateDto = MemberUpdateDto.builder()
+            MemberDto memberUpdateDto = MemberDto.builder()
                     .password("hello@Entity!")
                     .nickname("middleFitting")
                     .build();
@@ -98,14 +96,14 @@ class MemberTest {
         }
         finally {
             IllegalStateException e1 = assertThrows(IllegalStateException.class,
-                    () ->   MemberUpdateDto.builder()
+                    () ->   MemberDto.builder()
                             .email("middleFitting@gmail.com")
                             .nickname("middleFitting")
                             .build());
             assertThat(e1.getMessage()).isEqualTo("필수 파라미터가 누락되었습니다!");
 
             IllegalStateException e2 = assertThrows(IllegalStateException.class,
-                    () ->   MemberUpdateDto.builder()
+                    () ->   MemberDto.builder()
                             .email("middleFitting@gmail.com")
                             .password("hello@Entity!")
                             .build());

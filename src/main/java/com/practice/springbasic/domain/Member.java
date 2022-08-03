@@ -1,6 +1,6 @@
 package com.practice.springbasic.domain;
 
-import com.practice.springbasic.domain.dto.MemberUpdateDto;
+import com.practice.springbasic.domain.dto.MemberDto;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -29,7 +29,7 @@ public class Member {
         this.password = password;
     }
 
-    public void memberUpdate(MemberUpdateDto memberUpdateDto) {
+    public void memberUpdate(MemberDto memberUpdateDto) {
         this.nickname = memberUpdateDto.getNickname();
         this.email = memberUpdateDto.getEmail();
         this.password = memberUpdateDto.getPassword();

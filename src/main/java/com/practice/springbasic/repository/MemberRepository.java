@@ -4,8 +4,7 @@ import com.practice.springbasic.domain.Member;
 
 import java.util.Optional;
 
-public interface MemberRepositoryCustom {
-    Member           save(Member member);
+public interface MemberRepository {
     Optional<Member> findByNicknameAndPassword(String nickname, String password);
     void             delete(Member member);
 }
