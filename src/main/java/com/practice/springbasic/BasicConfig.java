@@ -1,5 +1,7 @@
 package com.practice.springbasic;
 
+import com.practice.springbasic.controller.MemberController;
+import com.practice.springbasic.controller.MemberControllerImpl;
 import com.practice.springbasic.repository.MemberJpaRepository;
 import com.practice.springbasic.service.MemberService;
 import com.practice.springbasic.service.MemberServiceImpl;
@@ -19,5 +21,10 @@ public class BasicConfig {
     @Bean
     public MemberService memberService(){
         return new MemberServiceImpl(memberRepository);
+    }
+
+    @Bean
+    public MemberController memberController() {
+        return new MemberControllerImpl(memberService());
     }
 }
