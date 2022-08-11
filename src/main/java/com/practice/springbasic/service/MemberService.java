@@ -14,4 +14,8 @@ public interface MemberService {
     Long update(MemberDto memberUpdateDto);
 
     boolean withdrawal(String nickname, String password);
+
+    Boolean duplicateEmail(String email);
+
+    Boolean duplicateNickname(String nickname);
 }

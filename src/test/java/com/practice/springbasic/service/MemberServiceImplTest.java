@@ -97,6 +97,47 @@ class MemberServiceImplTest {
         assertThat(result).isEqualTo(false);
     }
 
+    @Test
+    public void duplicateEmailFind() throws Exception{
+
+        when(memberRepository.findByEmail(member.getEmail())).thenReturn(Optional.ofNullable(member));
+
+        Boolean result = memberService.duplicateEmail(member.getEmail());
+
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    public void duplicateEmailNotFind() throws Exception{
+
+        when(memberRepository.findByEmail(member.getEmail())).thenReturn(Optional.ofNullable(null));
+
+        Boolean result = memberService.duplicateEmail(member.getEmail());
+
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
+    public void duplicateNicknameFind() throws Exception{
+
+        when(memberRepository.findByNickname(member.getNickname())).thenReturn(Optional.ofNullable(member));
+
+        Boolean result = memberService.duplicateNickname(member.getNickname());
+
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    public void duplicateNicknameNotFind() throws Exception{
+
+        when(memberRepository.findByNickname(member.getNickname())).thenReturn(Optional.ofNullable(null));
+
+        Boolean result = memberService.duplicateNickname(member.getNickname());
+
+        assertThat(result).isEqualTo(false);
+    }
+
+
     private Member memberSample() {
         return Member.builder()
                 .email("middlefitting@google.com")

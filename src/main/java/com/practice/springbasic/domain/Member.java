@@ -1,11 +1,14 @@
 package com.practice.springbasic.domain;
 
 import com.practice.springbasic.domain.dto.MemberDto;
+import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
 
 @Entity
 @Getter
@@ -14,8 +17,14 @@ public class Member {
     @Id
     @GeneratedValue
     private Long    id;
+    @NotNull
+    @Length(min=4, max=20)
     private String  nickname;
+    @NotNull
+    @Email
     private String  email;
+    @NotNull
+    @Length(min=10, max=20)
     private String  password;
 
     @Builder

@@ -43,6 +43,26 @@ class MemberControllerImplTest {
     }
 
     @Test
+    public void joinMemberFailedByDuplicateEmail() throws Exception{
+        when(memberService.join(member)).thenReturn(member);
+        when(memberService.duplicateEmail(member.getEmail())).thenReturn(true);
+
+        Long result = memberController.joinMember(member);
+
+        assertThat(result).isEqualTo(-1);
+    }
+
+    @Test
+    public void joinMemberFailedByDuplicateNickname() throws Exception{
+        when(memberService.join(member)).thenReturn(member);
+        when(memberService.duplicateNickname(member.getNickname())).thenReturn(true);
+
+        Long result = memberController.joinMember(member);
+
+        assertThat(result).isEqualTo(-1);
+    }
+
+    @Test
     public void findMemberSuccess() throws Exception{
         when(memberService.find(member.getNickname(), member.getPassword())).thenReturn(Optional.ofNullable(member));
 
@@ -66,7 +86,7 @@ class MemberControllerImplTest {
         when(memberService.update(ArgumentMatchers.any(MemberDto.class))).thenReturn(1L);
         System.out.println(memberService.update(memberDto));
 
-        Member result = memberController.updateMember(member);
+        Member result = memberController.updateMember(1L, member);
 
         assertThat(result).isEqualTo(member);
     }
@@ -77,7 +97,7 @@ class MemberControllerImplTest {
         when(memberService.update(ArgumentMatchers.any(MemberDto.class))).thenReturn(0L);
         System.out.println(memberService.update(memberDto));
 
-        Member result = memberController.updateMember(member);
+        Member result = memberController.updateMember(1L, member);
 
         assertThat(result).isEqualTo(null);
     }
@@ -86,7 +106,7 @@ class MemberControllerImplTest {
     public void deleteMemberSuccess() throws Exception{
         when(memberService.withdrawal(member.getNickname(), member.getPassword())).thenReturn(true);
 
-        boolean result = memberController.deleteMember(member);
+        boolean result = memberController.deleteMember(1L, member);
 
         assertThat(result).isEqualTo(true);
     }
@@ -95,7 +115,41 @@ class MemberControllerImplTest {
     public void deleteMemberFailed() throws Exception{
         when(memberService.withdrawal(member.getNickname(), member.getPassword())).thenReturn(false);
 
-        boolean result = memberController.deleteMember(member);
+        boolean result = memberController.deleteMember(1L, member);
+
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
+    public void duplicateEmailFind() throws Exception{
+        when(memberService.duplicateEmail(member.getEmail())).thenReturn(true);
+
+        boolean result = memberController.duplicateEmail(member.getEmail());
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    public void duplicateEmailNotFind() throws Exception{
+        when(memberService.duplicateEmail(member.getEmail())).thenReturn(false);
+
+        boolean result = memberController.duplicateEmail(member.getEmail());
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
+    public void duplicateNicknameFind() throws Exception{
+        when(memberService.duplicateNickname(member.getNickname())).thenReturn(true);
+
+        boolean result = memberController.duplicateNickname(member.getNickname());
+
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    public void duplicateNicknameNotFind() throws Exception{
+        when(memberService.duplicateNickname(member.getNickname())).thenReturn(false);
+
+        boolean result = memberController.duplicateNickname(member.getNickname());
 
         assertThat(result).isEqualTo(false);
     }

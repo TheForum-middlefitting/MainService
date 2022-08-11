@@ -66,6 +66,38 @@ class MemberJpaRepositoryTest {
         assertThat(result.orElse(null)).isEqualTo(null);
     }
 
+    @Test
+    public void duplicateEmailFind() throws Exception{
+        memberJpaRepository.save(member);
+
+        Optional<Member> result = memberJpaRepository.findByEmail(member.getEmail());
+
+        assertThat(member).isEqualTo(result.orElse(null));
+    }
+
+    @Test
+    public void duplicateEmailNotFind() throws Exception{
+        Optional<Member> result = memberJpaRepository.findByEmail(member.getEmail());
+
+        assertThat(result.orElse(null)).isNull();
+    }
+
+    @Test
+    public void duplicateNicknameFind() throws Exception{
+        memberJpaRepository.save(member);
+
+        Optional<Member> result = memberJpaRepository.findByNickname(member.getNickname());
+
+        assertThat(member).isEqualTo(result.orElse(null));
+    }
+
+    @Test
+    public void duplicateNicknameNotFind() throws Exception{
+        Optional<Member> result = memberJpaRepository.findByNickname(member.getNickname());
+
+        assertThat(result.orElse(null)).isNull();
+    }
+
     private Member memberSample() {
         return Member.builder()
                 .email("middleFitting@gmail.com")
