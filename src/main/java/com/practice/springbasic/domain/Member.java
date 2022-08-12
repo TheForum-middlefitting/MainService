@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter
@@ -18,12 +19,15 @@ public class Member {
     @GeneratedValue
     private Long    id;
     @NotNull
+    @NotEmpty
     @Length(min=4, max=20)
     private String  nickname;
     @NotNull
+    @NotEmpty
     @Email
     private String  email;
     @NotNull
+    @NotEmpty
     @Length(min=10, max=20)
     private String  password;
 
