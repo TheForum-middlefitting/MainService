@@ -21,8 +21,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -153,7 +152,7 @@ class MemberControllerImplTest {
 
     @Test
     public void findMemberSuccess() throws Exception{
-        when(memberService.find(member.getNickname(), member.getPassword())).thenReturn(Optional.ofNullable(member));
+        when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(member));
         String content = objectMapper.writeValueAsString(member);
         ResultActions resultActions = makePostResultActions("/members/login", content);
 
@@ -169,38 +168,38 @@ class MemberControllerImplTest {
 
     @Test
     public void findMemberFailed() throws Exception{
-        when(memberService.find(member.getNickname(), member.getPassword())).thenReturn(Optional.ofNullable(null));
+        when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(null));
         String content = objectMapper.writeValueAsString(member);
         ResultActions resultActions = makePostResultActions("/members/login", content);
 
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("닉네임 혹은 패스워드가 잘못되었습니다!")))
+                .andExpect(jsonPath("$.message", equalTo("이메일 혹은 패스워드가 잘못되었습니다!")))
                 .andExpect(jsonPath("$.status").value(400));
     }
-//
-//    @Test
-//    public void updateMemberSuccess() throws Exception{
-//        MemberDto memberDto = memberDtoSample();
-//        when(memberService.update(ArgumentMatchers.any(MemberDto.class))).thenReturn(1L);
-//        System.out.println(memberService.update(memberDto));
-//
-//        Member result = memberController.updateMember(1L, member);
-//
-//        assertThat(result).isEqualTo(member);
-//    }
-//
-//    @Test
-//    public void updateMemberFailed() throws Exception{
-//        MemberDto memberDto = memberDtoSample();
-//        when(memberService.update(ArgumentMatchers.any(MemberDto.class))).thenReturn(0L);
-//        System.out.println(memberService.update(memberDto));
-//
-//        Member result = memberController.updateMember(1L, member);
-//
-//        assertThat(result).isEqualTo(null);
-//    }
+
+    @Test
+    public void updateMemberSuccess() throws Exception{
+        when(memberService.find(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(member));
+        String content = objectMapper.writeValueAsString(member);
+
+        LinkedMultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("id", "1");
+
+        ResultActions resultActions = makePutResultActions("/members/1", content, queryParams);
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", equalTo("success")))
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data.id").value(member.getId()))
+                .andExpect(jsonPath("$.data.id", equalTo(null)))
+                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+    }
+
+
 //
 //    @Test
 //    public void deleteMemberSuccess() throws Exception{
@@ -254,6 +253,14 @@ class MemberControllerImplTest {
 //        assertThat(result).isEqualTo(false);
 //    }
 //
+ResultActions makePutResultActions(String url, String content, LinkedMultiValueMap params) throws Exception {
+    return mockMvc.perform(put(url)
+                    .content(content)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON));
+//            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+}
+
     ResultActions makePostResultActions(String url, String content) throws Exception {
         return mockMvc.perform(post(url)
                         .content(content)

@@ -9,7 +9,7 @@ public interface MemberController {
 
     SuccessResult findMember(Member member, BindingResult bindingResult);
 
-    Member updateMember(Long id, Member member);
+    SuccessResult updateMember(Long id, Member member, BindingResult bindingResult);
 
     boolean deleteMember(Long id, Member member);
 

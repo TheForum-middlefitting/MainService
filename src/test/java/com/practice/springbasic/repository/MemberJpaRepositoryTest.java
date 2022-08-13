@@ -30,7 +30,7 @@ class MemberJpaRepositoryTest {
     public void createAndRead() throws Exception{
         memberJpaRepository.save(member);
 
-        Member result = memberJpaRepository.findByNicknameAndPassword("middleFitting", "helloSpringBoot!").get();
+        Member result = memberJpaRepository.findByEmailAndPassword("middleFitting@gmail.com", "helloSpringBoot!").get();
 
         assertThat(member.getId()).isEqualTo(member.getId());
         assertThat(result.getEmail()).isEqualTo(member.getEmail());
@@ -61,7 +61,7 @@ class MemberJpaRepositoryTest {
         memberJpaRepository.save(member);
         memberJpaRepository.delete(member);
 
-        Optional<Member> result = memberJpaRepository.findByNicknameAndPassword("middleFitting", "helloSpringBoot!");
+        Optional<Member> result = memberJpaRepository.findByEmailAndPassword("middleFitting@gmail.com", "helloSpringBoot!");
 
         assertThat(result.orElse(null)).isEqualTo(null);
     }
@@ -96,6 +96,25 @@ class MemberJpaRepositoryTest {
         Optional<Member> result = memberJpaRepository.findByNickname(member.getNickname());
 
         assertThat(result.orElse(null)).isNull();
+    }
+
+    @Test
+    public void findByIdAndPasswordFind() throws Exception{
+        memberJpaRepository.save(member);
+
+        Optional<Member> result = memberJpaRepository.findByIdAndPassword(member.getId(), member.getPassword());
+
+        assertThat(member).isEqualTo(result.orElse(null));
+    }
+
+    @Test
+    public void findByIdAndPasswordNotFind() throws Exception{
+        memberJpaRepository.save(member);
+        Optional<Member> result = memberJpaRepository.findByIdAndPassword(member.getId(), member.getPassword() + "2");
+        Optional<Member> result2 = memberJpaRepository.findByIdAndPassword(member.getId() + 1L, member.getPassword());
+
+        assertThat(result.orElse(null)).isNull();
+        assertThat(result2.orElse(null)).isNull();
     }
 
     private Member memberSample() {

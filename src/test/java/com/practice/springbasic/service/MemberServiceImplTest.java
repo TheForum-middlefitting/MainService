@@ -5,6 +5,7 @@ import com.practice.springbasic.domain.dto.MemberDto;
 import com.practice.springbasic.repository.MemberJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -41,17 +42,15 @@ class MemberServiceImplTest {
 
     @Test
     public void findMemberSuccess() throws Exception{
-        when(memberRepository.findByNicknameAndPassword(member.getNickname(), member.getPassword())).thenReturn(Optional.of(member));
+        when(memberRepository.findByEmailAndPassword(member.getEmail(), member.getPassword())).thenReturn(Optional.of(member));
 
-        Member result = memberService.find(member.getNickname(), member.getPassword()).orElse(null);
+        Member result = memberService.find(member.getEmail(), member.getPassword()).orElse(null);
 
         assertThat(result).isEqualTo(member);
     }
 
     @Test
     public void findMemberFailed() throws Exception{
-        when(memberRepository.findByNicknameAndPassword("differentNickname", "differentPassword")).thenReturn(Optional.ofNullable(null));
-
         Member result = memberService.find(member.getNickname(), member.getPassword()).orElse(null);
 
         assertThat(result).isEqualTo(null);
@@ -60,29 +59,18 @@ class MemberServiceImplTest {
     @Test
     public void updateMemberFound() throws Exception{
         MemberDto memberSuccessDto = memberDtoExistSample();
-        when(memberRepository.findByNicknameAndPassword(memberSuccessDto.getNickname(), memberSuccessDto.getPassword())).thenReturn(Optional.ofNullable(member));
 
-        Long result = memberService.update(memberSuccessDto);
+        Long result = memberService.update(member, memberSuccessDto);
 
         assertThat(result).isEqualTo(null);
     }
 
     @Test
-    public void updateMemberNotFound() throws Exception{
-        MemberDto memberFailedDto = memberDtoNotExistSample();
-        when(memberRepository.findByNicknameAndPassword(memberFailedDto.getNickname(), memberFailedDto.getPassword())).thenReturn(Optional.ofNullable(null));
-
-        Long result = memberService.update(memberFailedDto);
-
-        assertThat(result).isEqualTo(0L);
-    }
-
-    @Test
     public void withdrawalMemberSuccess() throws Exception{
         MemberDto memberSuccessDto = memberDtoExistSample();
-        when(memberRepository.findByNicknameAndPassword(memberSuccessDto.getNickname(), memberSuccessDto.getPassword())).thenReturn(Optional.ofNullable(member));
+        when(memberRepository.findByEmailAndPassword(memberSuccessDto.getEmail(), memberSuccessDto.getPassword())).thenReturn(Optional.ofNullable(member));
 
-        boolean result = memberService.withdrawal(memberSuccessDto.getNickname(), memberSuccessDto.getPassword());
+        boolean result = memberService.withdrawal(memberSuccessDto.getEmail(), memberSuccessDto.getPassword());
 
         assertThat(result).isEqualTo(true);
     }
@@ -90,9 +78,9 @@ class MemberServiceImplTest {
     @Test
     public void withdrawalMemberFailed() throws Exception{
         MemberDto memberFailedDto = memberDtoNotExistSample();
-        when(memberRepository.findByNicknameAndPassword(memberFailedDto.getNickname(), memberFailedDto.getPassword())).thenReturn(Optional.ofNullable(null));
+        when(memberRepository.findByEmailAndPassword(memberFailedDto.getEmail(), memberFailedDto.getPassword())).thenReturn(Optional.ofNullable(null));
 
-        boolean result = memberService.withdrawal(memberFailedDto.getNickname(), memberFailedDto.getPassword());
+        boolean result = memberService.withdrawal(memberFailedDto.getEmail(), memberFailedDto.getPassword());
 
         assertThat(result).isEqualTo(false);
     }
@@ -135,6 +123,26 @@ class MemberServiceImplTest {
         Boolean result = memberService.duplicateNickname(member.getNickname());
 
         assertThat(result).isEqualTo(false);
+    }
+
+    @Test
+    public void memberFindByIdAndPassword() throws Exception{
+
+        when(memberRepository.findByIdAndPassword(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(member));
+
+        Boolean result = memberService.findMemberByIdAndPassword(1L, member.getPassword());
+
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    public void memberNotFindByIdAndPassword() throws Exception{
+        when(memberRepository.findByIdAndPassword(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(null));
+
+        Boolean result = memberService.findMemberByIdAndPassword(1L, member.getPassword());
+
+        assertThat(result).isEqualTo(false);
+
     }
 
 

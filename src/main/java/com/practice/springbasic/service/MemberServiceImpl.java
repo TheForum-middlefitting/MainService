@@ -25,24 +25,21 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public Optional<Member> find(String nickname, String password) {
-        Optional<Member> member = memberRepository.findByNicknameAndPassword(nickname, password);
+    public Optional<Member> find(String email, String password) {
+        Optional<Member> member = memberRepository.findByEmailAndPassword(email, password);
         return member;
     }
 
     @Override
-    public Long update(MemberDto memberDto) {
-        Member member = find(memberDto.getNickname(), memberDto.getPassword()).orElse(null);
-        if (member == null)
-            return 0L;
+    public Long update(Member member, MemberDto memberDto) {
         member.memberUpdate(memberDto);
         memberRepository.save(member);
         return member.getId();
     }
 
     @Override
-    public boolean withdrawal(String nickname, String password){
-        Member member = find(nickname, password).orElse(null);
+    public boolean withdrawal(String email, String password){
+        Member member = find(email, password).orElse(null);
         if(member == null)
             return false;
         memberRepository.delete(member);
@@ -58,6 +55,12 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Boolean duplicateNickname(String nickname) {
         Optional<Member> member = memberRepository.findByNickname(nickname);
+        return member.orElse(null) != null;
+    }
+
+    @Override
+    public Boolean findMemberByIdAndPassword(long id, String password) {
+        Optional<Member> member = memberRepository.findByIdAndPassword(id, password);
         return member.orElse(null) != null;
     }
 }
