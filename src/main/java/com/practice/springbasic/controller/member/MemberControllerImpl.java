@@ -1,5 +1,6 @@
 package com.practice.springbasic.controller.member;
 
+import com.practice.springbasic.controller.form.DeleteMemberForm;
 import com.practice.springbasic.controller.utils.ReturnMemberForm;
 import com.practice.springbasic.controller.utils.SuccessResult;
 import com.practice.springbasic.domain.Member;
@@ -27,8 +28,8 @@ public class MemberControllerImpl implements MemberController{
     @PostMapping("/members")
     public SuccessResult joinMember(@RequestBody @Validated Member member, BindingResult bindingResult) {
         bindingResultCheck(bindingResult.hasErrors());
-        duplicateEmail(member.getEmail());
-        duplicateNickname(member.getNickname());
+        duplicateEmailCheck(member.getEmail());
+        duplicateNicknameCheck(member.getNickname());
         memberService.join(member);
         ReturnMemberForm memberForm = createMemberForm(member);
         return new SuccessResult(memberForm, "success", 200);
@@ -40,7 +41,7 @@ public class MemberControllerImpl implements MemberController{
         bindingResultCheck(bindingResult.hasErrors());
         Member find =  memberService.find(member.getEmail(), member.getPassword()).orElse(null);
         memberNullCheck(find);
-        ReturnMemberForm memberForm = createMemberForm(member);
+        ReturnMemberForm memberForm = createMemberForm(find);
         return new SuccessResult(memberForm, "success", 200);
     }
 
@@ -52,9 +53,7 @@ public class MemberControllerImpl implements MemberController{
         bindingResultCheck(bindingResult.hasErrors());
         Member preMember = memberService.find(member.getEmail(), member.getPassword()).orElse(null);
         memberNullCheck(preMember);
-//        assert preMember != null;
-//        memberIdAndPathIdSameCheck(preMember, id);
-        duplicateNickname(member.getNickname());
+        duplicateNicknameCheck(member.getNickname());
         MemberDto memberDto = createMemberDto(member);
         memberService.update(preMember, memberDto);
         ReturnMemberForm memberForm = createMemberForm(preMember);
@@ -63,19 +62,23 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @DeleteMapping("members/{id}")
-    public boolean deleteMember(@PathVariable Long id, @RequestBody @Validated Member member) {
-        return memberService.withdrawal(member.getNickname(), member.getPassword());
+    public SuccessResult deleteMember(@PathVariable Long id, @RequestBody @Validated DeleteMemberForm memberForm, BindingResult bindingResult) {
+        bindingResultCheck(bindingResult.hasErrors());
+        Member compareMember = memberService.findMemberByIdAndPassword(id, memberForm.getPassword()).orElse(null);
+        memberNullCheck(compareMember);
+        memberService.withdrawal(compareMember);
+        return new SuccessResult(null, "success", 200);
     }
 
     @Override
-    public void duplicateEmail(String email) {
+    public void duplicateEmailCheck(String email) {
         if (memberService.duplicateEmail(email)){
             throw new IllegalArgumentException("중복된 이메일입니다!");
         }
     }
 
     @Override
-    public void duplicateNickname(String nickname) {
+    public void duplicateNicknameCheck(String nickname) {
         if(memberService.duplicateNickname(nickname)) {
             throw new IllegalArgumentException("중복된 닉네임입니다!");
         }
@@ -88,11 +91,6 @@ public class MemberControllerImpl implements MemberController{
     public void memberNullCheck(Object checkValue) {
         if(checkValue == null) {throw new IllegalArgumentException("이메일 혹은 패스워드가 잘못되었습니다!");}
     }
-
-//    public void memberIdAndPathIdSameCheck(Member member, Long id) {
-//        if(!member.getId().equals(id)) { throw new IllegalArgumentException("정상적이지 않은 접근");}
-//    }
-
 
     public MemberDto createMemberDto(Member member) {
         return MemberDto.builder()

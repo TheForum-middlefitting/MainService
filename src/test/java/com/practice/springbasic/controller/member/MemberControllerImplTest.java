@@ -1,6 +1,7 @@
 package com.practice.springbasic.controller.member;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practice.springbasic.controller.form.DeleteMemberForm;
 import com.practice.springbasic.controller.member.MemberControllerImpl;
 import com.practice.springbasic.domain.Member;
 import com.practice.springbasic.domain.dto.MemberDto;
@@ -47,20 +48,6 @@ class MemberControllerImplTest {
         FailedPasswordParsingMember = memberSample("middlefitting@google.com", "%mid", "middlefitting");
         FailedNicknameParsingMember = memberSample("middlefitting@google.com", "%middlefitting", "");
     }
-
-//    @Test
-//    public void joinMemberSuccess1() throws Exception{
-//        when(memberService.join(ArgumentMatchers.any(Member.class))).thenReturn(member);
-//        String content = objectMapper.writeValueAsString(member);
-//        mockMvc.perform(post("/members") //mockmvcrequestbuilders.post
-//                        .content(content)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk()) //mockmvcresult
-//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)) //mockmvcresult
-//                .andExpect(jsonPath("$.data.id").value(member.getId()))
-//                .andDo(print()); //mockmvc print
-//    }
 
     @Test
     public void joinMemberSuccess() throws Exception{
@@ -184,10 +171,7 @@ class MemberControllerImplTest {
         when(memberService.find(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(member));
         String content = objectMapper.writeValueAsString(member);
 
-        LinkedMultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("id", "1");
-
-        ResultActions resultActions = makePutResultActions("/members/1", content, queryParams);
+        ResultActions resultActions = makePutResultActions("/members/1", content);
 
         resultActions
                 .andExpect(status().isOk())
@@ -200,66 +184,36 @@ class MemberControllerImplTest {
     }
 
 
-//
-//    @Test
-//    public void deleteMemberSuccess() throws Exception{
-//        when(memberService.withdrawal(member.getNickname(), member.getPassword())).thenReturn(true);
-//
-//        boolean result = memberController.deleteMember(1L, member);
-//
-//        assertThat(result).isEqualTo(true);
-//    }
-//
-//    @Test
-//    public void deleteMemberFailed() throws Exception{
-//        when(memberService.withdrawal(member.getNickname(), member.getPassword())).thenReturn(false);
-//
-//        boolean result = memberController.deleteMember(1L, member);
-//
-//        assertThat(result).isEqualTo(false);
-//    }
-//
-//    @Test
-//    public void duplicateEmailFind() throws Exception{
-//        when(memberService.duplicateEmail(member.getEmail())).thenReturn(true);
-//
-//        boolean result = memberController.duplicateEmail(member.getEmail());
-//        assertThat(result).isEqualTo(true);
-//    }
-//
-//    @Test
-//    public void duplicateEmailNotFind() throws Exception{
-//        when(memberService.duplicateEmail(member.getEmail())).thenReturn(false);
-//
-//        boolean result = memberController.duplicateEmail(member.getEmail());
-//        assertThat(result).isEqualTo(false);
-//    }
-//
-//    @Test
-//    public void duplicateNicknameFind() throws Exception{
-//        when(memberService.duplicateNickname(member.getNickname())).thenReturn(true);
-//
-//        boolean result = memberController.duplicateNickname(member.getNickname());
-//
-//        assertThat(result).isEqualTo(true);
-//    }
-//
-//    @Test
-//    public void duplicateNicknameNotFind() throws Exception{
-//        when(memberService.duplicateNickname(member.getNickname())).thenReturn(false);
-//
-//        boolean result = memberController.duplicateNickname(member.getNickname());
-//
-//        assertThat(result).isEqualTo(false);
-//    }
-//
-ResultActions makePutResultActions(String url, String content, LinkedMultiValueMap params) throws Exception {
-    return mockMvc.perform(put(url)
-                    .content(content)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON));
-//            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
-}
+
+    @Test
+    public void deleteMemberSuccess() throws Exception{
+        when(memberService.findMemberByIdAndPassword(1L, member.getPassword())).thenReturn(Optional.ofNullable(member));
+        DeleteMemberForm memberForm = new DeleteMemberForm(member.getPassword());
+        String content = objectMapper.writeValueAsString(memberForm);
+        ResultActions resultActions = makeDeleteResultActions("/members/1", content);
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", equalTo("success")))
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data", equalTo(null)));
+    }
+
+    ResultActions makeDeleteResultActions(String url, String content) throws Exception {
+        return mockMvc.perform(delete(url)
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    ResultActions makePutResultActions(String url, String content) throws Exception {
+        return mockMvc.perform(put(url)
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
 
     ResultActions makePostResultActions(String url, String content) throws Exception {
         return mockMvc.perform(post(url)

@@ -38,12 +38,8 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public boolean withdrawal(String email, String password){
-        Member member = find(email, password).orElse(null);
-        if(member == null)
-            return false;
+    public void withdrawal(Member member){
         memberRepository.delete(member);
-        return true;
     }
 
     @Override
@@ -59,8 +55,7 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public Boolean findMemberByIdAndPassword(long id, String password) {
-        Optional<Member> member = memberRepository.findByIdAndPassword(id, password);
-        return member.orElse(null) != null;
+    public Optional<Member> findMemberByIdAndPassword(long id, String password) {
+        return memberRepository.findByIdAndPassword(id, password);
     }
 }

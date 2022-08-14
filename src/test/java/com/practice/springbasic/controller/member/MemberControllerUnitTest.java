@@ -54,28 +54,28 @@ public class MemberControllerUnitTest {
     public void duplicateNicknameCheckFailed() throws Exception{
         when(memberService.duplicateNickname(ArgumentMatchers.anyString())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateNickname(member.getNickname());});
+        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateNicknameCheck(member.getNickname());});
     }
 
     @Test
     public void duplicateNicknameCheckSuccess() throws Exception{
         when(memberService.duplicateNickname(ArgumentMatchers.anyString())).thenReturn(false);
 
-        memberController.duplicateNickname(member.getNickname());
+        memberController.duplicateNicknameCheck(member.getNickname());
     }
 
     @Test
     public void duplicateEmailCheckFailed() throws Exception{
         when(memberService.duplicateEmail(ArgumentMatchers.anyString())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateEmail(member.getNickname());});
+        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateEmailCheck(member.getNickname());});
     }
 
     @Test
     public void duplicateEmailCheckSuccess() throws Exception{
         when(memberService.duplicateEmail(ArgumentMatchers.anyString())).thenReturn(false);
 
-        memberController.duplicateEmail(member.getNickname());
+        memberController.duplicateEmailCheck(member.getNickname());
     }
 
     @Test

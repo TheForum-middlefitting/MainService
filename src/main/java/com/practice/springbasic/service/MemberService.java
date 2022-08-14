@@ -13,11 +13,11 @@ public interface MemberService {
 
     Long update(Member member, MemberDto memberUpdateDto);
 
-    boolean withdrawal(String email, String password);
+    void withdrawal(Member member);
 
     Boolean duplicateEmail(String email);
 
     Boolean duplicateNickname(String nickname);
 
-    Boolean findMemberByIdAndPassword(long id, String password);
+    Optional<Member> findMemberByIdAndPassword(long id, String password);
 }

@@ -67,22 +67,9 @@ class MemberServiceImplTest {
 
     @Test
     public void withdrawalMemberSuccess() throws Exception{
-        MemberDto memberSuccessDto = memberDtoExistSample();
-        when(memberRepository.findByEmailAndPassword(memberSuccessDto.getEmail(), memberSuccessDto.getPassword())).thenReturn(Optional.ofNullable(member));
+        when(memberRepository.findByEmailAndPassword(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(member));
 
-        boolean result = memberService.withdrawal(memberSuccessDto.getEmail(), memberSuccessDto.getPassword());
-
-        assertThat(result).isEqualTo(true);
-    }
-
-    @Test
-    public void withdrawalMemberFailed() throws Exception{
-        MemberDto memberFailedDto = memberDtoNotExistSample();
-        when(memberRepository.findByEmailAndPassword(memberFailedDto.getEmail(), memberFailedDto.getPassword())).thenReturn(Optional.ofNullable(null));
-
-        boolean result = memberService.withdrawal(memberFailedDto.getEmail(), memberFailedDto.getPassword());
-
-        assertThat(result).isEqualTo(false);
+        memberService.withdrawal(member);
     }
 
     @Test
@@ -130,18 +117,18 @@ class MemberServiceImplTest {
 
         when(memberRepository.findByIdAndPassword(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(member));
 
-        Boolean result = memberService.findMemberByIdAndPassword(1L, member.getPassword());
+        Optional<Member> result = memberService.findMemberByIdAndPassword(1L, member.getPassword());
 
-        assertThat(result).isEqualTo(true);
+        assertThat(result.orElse(null)).isEqualTo(member);
     }
 
     @Test
     public void memberNotFindByIdAndPassword() throws Exception{
         when(memberRepository.findByIdAndPassword(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(null));
 
-        Boolean result = memberService.findMemberByIdAndPassword(1L, member.getPassword());
+        Optional<Member> result = memberService.findMemberByIdAndPassword(1L, member.getPassword());
 
-        assertThat(result).isEqualTo(false);
+        assertThat(result.orElse(null)).isEqualTo(null);
 
     }
 

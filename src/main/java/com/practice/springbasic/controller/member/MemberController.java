@@ -1,5 +1,6 @@
 package com.practice.springbasic.controller.member;
 
+import com.practice.springbasic.controller.form.DeleteMemberForm;
 import com.practice.springbasic.controller.utils.SuccessResult;
 import com.practice.springbasic.domain.Member;
 import org.springframework.validation.BindingResult;
@@ -11,9 +12,9 @@ public interface MemberController {
 
     SuccessResult updateMember(Long id, Member member, BindingResult bindingResult);
 
-    boolean deleteMember(Long id, Member member);
+    SuccessResult deleteMember(Long id, DeleteMemberForm memberForm, BindingResult bindingResult);
 
-    void duplicateEmail(String email);
+    void duplicateEmailCheck(String email);
 
-    void duplicateNickname(String nickname);
+    void duplicateNicknameCheck(String nickname);
 }
