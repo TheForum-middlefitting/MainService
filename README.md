@@ -9,8 +9,8 @@
 
 ## Function
 - Member API (22/08/11)
-- Member Exception(22/08/12~)
-- Jwt Tokenizing && Spring Security
+- Member Exception(22/08/14)
+- Jwt Tokenizing && Spring Security(2022/08/14~)
 - Board API
 - Board Exception
 - AOP
