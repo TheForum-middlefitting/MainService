@@ -1,5 +1,10 @@
 package com.practice.springbasic.controller.member;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.practice.springbasic.config.jwt.JwtProperties;
+import com.practice.springbasic.config.jwt.JwtUtils;
 import com.practice.springbasic.controller.form.DeleteMemberForm;
 import com.practice.springbasic.controller.utils.ReturnMemberForm;
 import com.practice.springbasic.controller.utils.SuccessResult;
@@ -11,8 +16,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.directory.InvalidAttributesException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.text.html.Option;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 
 @RestController
@@ -37,20 +45,30 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PostMapping("/members/login")
-    public SuccessResult findMember(@RequestBody @Validated Member member, BindingResult bindingResult) {
+    public SuccessResult loginMember(HttpServletResponse response, @RequestBody @Validated Member member, BindingResult bindingResult) {
+//        String jwtToken = request.getHeader("Authorization").replace("MiddleFittingBearer", "");
+//        DecodedJWT verify = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(jwtToken);
+//        Long verifyId = verify.getClaim("id").asLong();
         bindingResultCheck(bindingResult.hasErrors());
         Member find =  memberService.find(member.getEmail(), member.getPassword()).orElse(null);
         memberNullCheck(find);
         ReturnMemberForm memberForm = createMemberForm(find);
+
+        String accessJwtToken = JwtUtils.generateAccessJwtToken(find);
+        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(find);
+        response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
+        response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
+
         return new SuccessResult(memberForm, "success", 200);
     }
 
     @Override
     @PutMapping("members/{id}")
-    public SuccessResult updateMember(@PathVariable Long id, @RequestBody @Validated Member member, BindingResult bindingResult) {
+    public SuccessResult updateMember(HttpServletRequest request, @PathVariable Long id, @RequestBody @Validated Member member, BindingResult bindingResult) {
         //++++++id 와 토큰의 id 불일치 하면 exception
         //이메일은 바뀌지 말아야 한다.
         bindingResultCheck(bindingResult.hasErrors());
+        JwtUtils.verifyJwtToken(request, id, JwtProperties.ACCESS_HEADER_STRING);
         Member preMember = memberService.find(member.getEmail(), member.getPassword()).orElse(null);
         memberNullCheck(preMember);
         duplicateNicknameCheck(member.getNickname());
@@ -62,8 +80,9 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @DeleteMapping("members/{id}")
-    public SuccessResult deleteMember(@PathVariable Long id, @RequestBody @Validated DeleteMemberForm memberForm, BindingResult bindingResult) {
+    public SuccessResult deleteMember(HttpServletRequest request, @PathVariable Long id, @RequestBody @Validated DeleteMemberForm memberForm, BindingResult bindingResult) {
         bindingResultCheck(bindingResult.hasErrors());
+        JwtUtils.verifyJwtToken(request, id, JwtProperties.ACCESS_HEADER_STRING);
         Member compareMember = memberService.findMemberByIdAndPassword(id, memberForm.getPassword()).orElse(null);
         memberNullCheck(compareMember);
         memberService.withdrawal(compareMember);
