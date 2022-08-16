@@ -1,23 +1,28 @@
 # Spring basic web Project
 
 ## Project Describe
-- Simple web page
+- Web page
+- Monolithic architecture
 - Client side rendering with thymeleaf
 - Developed by TDD
 - Rest API
-- Basic Login && CRUD board
+- Login && CRUD board functions
 
-## Function
+## Development status
 - Member API (22/08/11)
 - Member Exception(22/08/14)
-- Jwt Tokenizing && Spring Security(2022/08/14~)
+- Jwt Tokenizing(2022/08/14~)
+- Jwt Exception
 - Board API
 - Board Exception
-- AOP
-- Client Rendering
 - Admin Rest API
+- Admin Exception
+- Client Rendering
 - Admin Rendering
-- release
+- Spring Security
+- AOP
+- API Document
+- 1st release
 
 ## Skill
 **Backend**
