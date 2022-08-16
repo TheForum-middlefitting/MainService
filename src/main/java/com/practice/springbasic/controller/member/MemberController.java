@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public interface MemberController {
-    SuccessResult joinMember(Member member, BindingResult bindingResult);
+    SuccessResult joinMember(HttpServletResponse response, Member member, BindingResult bindingResult);
 
     SuccessResult loginMember(HttpServletResponse response, Member member, BindingResult bindingResult);
 

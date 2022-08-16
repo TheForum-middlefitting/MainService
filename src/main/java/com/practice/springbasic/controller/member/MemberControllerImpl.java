@@ -34,48 +34,48 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PostMapping("/members")
-    public SuccessResult joinMember(@RequestBody @Validated Member member, BindingResult bindingResult) {
+    public SuccessResult joinMember(HttpServletResponse response, @RequestBody @Validated Member member, BindingResult bindingResult) {
         bindingResultCheck(bindingResult.hasErrors());
         duplicateEmailCheck(member.getEmail());
         duplicateNicknameCheck(member.getNickname());
         memberService.join(member);
-        ReturnMemberForm memberForm = createMemberForm(member);
-        return new SuccessResult(memberForm, "success", 200);
+
+        String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getPassword());
+        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getPassword());
+        response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
+        response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
+        return new SuccessResult(createMemberForm(member), "success", 200);
     }
 
     @Override
     @PostMapping("/members/login")
-    public SuccessResult loginMember(HttpServletResponse response, @RequestBody @Validated Member member, BindingResult bindingResult) {
-//        String jwtToken = request.getHeader("Authorization").replace("MiddleFittingBearer", "");
-//        DecodedJWT verify = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(jwtToken);
-//        Long verifyId = verify.getClaim("id").asLong();
+    public SuccessResult loginMember(HttpServletResponse response, @RequestBody @Validated Member memberInfo, BindingResult bindingResult) {
         bindingResultCheck(bindingResult.hasErrors());
-        Member find =  memberService.find(member.getEmail(), member.getPassword()).orElse(null);
-        memberNullCheck(find);
-        ReturnMemberForm memberForm = createMemberForm(find);
+        Member member =  memberService.find(memberInfo.getEmail(), memberInfo.getPassword()).orElse(null);
+        memberNullCheck(member);
+        assert member != null;
 
-        String accessJwtToken = JwtUtils.generateAccessJwtToken(find);
-        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(find);
+        String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getPassword());
+        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getPassword());
         response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
         response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
-
-        return new SuccessResult(memberForm, "success", 200);
+        return new SuccessResult(createMemberForm(member), "success", 200);
     }
 
     @Override
     @PutMapping("members/{id}")
     public SuccessResult updateMember(HttpServletRequest request, @PathVariable Long id, @RequestBody @Validated Member member, BindingResult bindingResult) {
-        //++++++id 와 토큰의 id 불일치 하면 exception
         //이메일은 바뀌지 말아야 한다.
         bindingResultCheck(bindingResult.hasErrors());
         JwtUtils.verifyJwtToken(request, id, JwtProperties.ACCESS_HEADER_STRING);
+        duplicateNicknameCheck(member.getNickname());
+
         Member preMember = memberService.find(member.getEmail(), member.getPassword()).orElse(null);
         memberNullCheck(preMember);
-        duplicateNicknameCheck(member.getNickname());
-        MemberDto memberDto = createMemberDto(member);
-        memberService.update(preMember, memberDto);
-        ReturnMemberForm memberForm = createMemberForm(preMember);
-        return new SuccessResult(memberForm, "success", 200);
+        assert preMember != null;
+
+        memberService.update(preMember, createMemberDto(member));
+        return new SuccessResult(createMemberForm(preMember), "success", 200);
     }
 
     @Override

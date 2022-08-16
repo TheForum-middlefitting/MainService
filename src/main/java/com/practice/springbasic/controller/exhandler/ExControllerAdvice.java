@@ -11,13 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
-    public ErrorResult illegalArgumentExhandler(IllegalArgumentException e) {
+    public ErrorResult illegalArgumentExHandler(IllegalArgumentException e) {
         return new ErrorResult("BAD_REQUEST", e.getMessage(), 400);
     }
-
-
-
-
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AlgorithmMismatchException.class)
@@ -52,12 +48,12 @@ public class ExControllerAdvice {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler
     public ErrorResult runtimeExHandler(RuntimeException e) {
-        return new ErrorResult("BAD_REQUEST", "정상적이지 않은 접근", 403);
+        return new ErrorResult("BAD_REQUEST", "경고 정상적이지 않은 접근", 403);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public ErrorResult exHandler(Exception e) {
-        return new ErrorResult("UNKNOWN_ERROR", "내부 서버 오류", 500);
+        return new ErrorResult("UNKNOWN_ERROR", "알 수 없는 오류", 500);
     }
 }

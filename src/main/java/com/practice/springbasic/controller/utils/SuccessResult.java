@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SuccessResult {
-    private ReturnMemberForm data;
+    private Object data;
     private String message;
     private int status;
 }
