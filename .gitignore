@@ -37,4 +37,5 @@ out/
 .vscode/
 
 ##Secure
-JwtProperties*
+JwtProperties.java
+*properties*

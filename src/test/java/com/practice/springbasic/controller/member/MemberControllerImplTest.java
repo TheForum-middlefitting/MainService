@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.controller.form.DeleteMemberForm;
 import com.practice.springbasic.controller.member.MemberControllerImpl;
+import com.practice.springbasic.controller.utils.LoginMemberForm;
 import com.practice.springbasic.domain.Member;
 import com.practice.springbasic.domain.dto.MemberDto;
 import com.practice.springbasic.service.MemberService;
@@ -162,9 +163,9 @@ class MemberControllerImplTest {
     @Test
     public void loginMemberSuccess() throws Exception{
         when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(member));
-        String content = objectMapper.writeValueAsString(member);
+        LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
+        String content = objectMapper.writeValueAsString(loginMemberForm);
         ResultActions resultActions = makePostResultActions("/members/login", content);
-
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Authorization"))
@@ -180,7 +181,8 @@ class MemberControllerImplTest {
     @Test
     public void loginMemberFailed() throws Exception{
         when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(null));
-        String content = objectMapper.writeValueAsString(member);
+        LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
+        String content = objectMapper.writeValueAsString(loginMemberForm);
         ResultActions resultActions = makePostResultActions("/members/login", content);
 
         resultActions

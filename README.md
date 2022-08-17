@@ -11,9 +11,9 @@
 ## Development status
 - Member API (22/08/11)
 - Member Exception(22/08/14)
-- Jwt Tokenizing(2022/08/14~)
-- Jwt Exception
-- Board API
+- Jwt Tokenizing(2022/08/17)
+- Jwt Exception(2022/08/17)
+- Board API(2022/08/17~)
 - Board Exception
 - Admin Rest API
 - Admin Exception

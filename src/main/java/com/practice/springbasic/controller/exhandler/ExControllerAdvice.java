@@ -18,25 +18,25 @@ public class ExControllerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AlgorithmMismatchException.class)
     public ErrorResult jwtDecodeExHandler(JWTDecodeException e) {
-        return new ErrorResult("BAD_REQUEST", "잘못된 알고리즘의 토큰", 401);
+        return new ErrorResult("UNAUTHORIZED", "잘못된 알고리즘의 토큰", 401);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(TokenExpiredException.class)
     public ErrorResult jwtDecodeExHandler(TokenExpiredException e) {
-        return new ErrorResult("BAD_REQUEST", "만료된 토큰", 401);
+        return new ErrorResult("UNAUTHORIZED", "만료된 토큰", 401);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(InvalidClaimException.class)
     public ErrorResult jwtDecodeExHandler(InvalidClaimException e) {
-        return new ErrorResult("BAD_REQUEST", "경고 정상적이지 않은 토큰", 401);
+        return new ErrorResult("UNAUTHORIZED", "경고 정상적이지 않은 토큰", 401);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(SignatureVerificationException.class)
     public ErrorResult jwtDecodeExHandler(SignatureVerificationException e) {
-        return new ErrorResult("BAD_REQUEST", "경고 정상적이지 않은 토큰", 401);
+        return new ErrorResult("UNAUTHORIZED", "경고 정상적이지 않은 토큰", 401);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -48,7 +48,7 @@ public class ExControllerAdvice {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler
     public ErrorResult runtimeExHandler(RuntimeException e) {
-        return new ErrorResult("BAD_REQUEST", "경고 정상적이지 않은 접근", 403);
+        return new ErrorResult("FORBIDDEN", "경고 정상적이지 않은 접근", 403);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

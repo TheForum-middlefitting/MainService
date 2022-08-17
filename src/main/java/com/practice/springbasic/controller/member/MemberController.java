@@ -1,6 +1,7 @@
 package com.practice.springbasic.controller.member;
 
 import com.practice.springbasic.controller.form.DeleteMemberForm;
+import com.practice.springbasic.controller.utils.LoginMemberForm;
 import com.practice.springbasic.controller.utils.SuccessResult;
 import com.practice.springbasic.domain.Member;
 import org.springframework.validation.BindingResult;
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 public interface MemberController {
     SuccessResult joinMember(HttpServletResponse response, Member member, BindingResult bindingResult);
 
-    SuccessResult loginMember(HttpServletResponse response, Member member, BindingResult bindingResult);
+    SuccessResult loginMember(HttpServletResponse response, LoginMemberForm loginMemberForm, BindingResult bindingResult);
 
     SuccessResult updateMember(HttpServletRequest request, Long id, Member member, BindingResult bindingResult);
 

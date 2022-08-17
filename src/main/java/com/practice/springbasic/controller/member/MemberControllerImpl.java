@@ -6,6 +6,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.config.jwt.JwtUtils;
 import com.practice.springbasic.controller.form.DeleteMemberForm;
+import com.practice.springbasic.controller.utils.LoginMemberForm;
 import com.practice.springbasic.controller.utils.ReturnMemberForm;
 import com.practice.springbasic.controller.utils.SuccessResult;
 import com.practice.springbasic.domain.Member;
@@ -49,9 +50,9 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PostMapping("/members/login")
-    public SuccessResult loginMember(HttpServletResponse response, @RequestBody @Validated Member memberInfo, BindingResult bindingResult) {
+    public SuccessResult loginMember(HttpServletResponse response, @RequestBody LoginMemberForm loginMemberForm, BindingResult bindingResult) {
         bindingResultCheck(bindingResult.hasErrors());
-        Member member =  memberService.find(memberInfo.getEmail(), memberInfo.getPassword()).orElse(null);
+        Member member =  memberService.find(loginMemberForm.getEmail(), loginMemberForm.getPassword()).orElse(null);
         memberNullCheck(member);
         assert member != null;
 
