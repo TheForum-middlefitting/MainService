@@ -5,9 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
@@ -16,19 +14,14 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
     @Id
-    @GeneratedValue
-    private Long    id;
-    @NotNull
-    @NotEmpty
-    @Length(min=4, max=20)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "member_id")
+    private Long id;
+    @NotNull @NotEmpty @Length(min=4, max=20)
     private String  nickname;
-    @NotNull
-    @NotEmpty
-    @Email
+    @NotNull @NotEmpty @Email
     private String  email;
-    @NotNull
-    @NotEmpty
-    @Length(min=10, max=20)
+    @NotNull @NotEmpty @Length(min=10, max=20)
     private String  password;
 
     @Builder
@@ -36,7 +29,6 @@ public class Member {
         if(nickname == null || email == null || password == null) {
             throw new IllegalStateException("필수 파라미터가 누락되었습니다!");
         }
-
         this.nickname = nickname;
         this.email = email;
         this.password = password;
