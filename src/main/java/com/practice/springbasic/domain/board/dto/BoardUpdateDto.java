@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @AllArgsConstructor
 public class BoardUpdateDto {
-    @Enumerated(EnumType.STRING) @NotNull @NotEmpty
+    @Enumerated(EnumType.STRING) @NotNull
     BoardCategory boardCategory;
     @NotNull @NotEmpty @Length( min = 5, max = 20)
     String title;

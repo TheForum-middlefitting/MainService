@@ -1,17 +1,23 @@
 package com.practice.springbasic.domain.board;
 
 import com.practice.springbasic.domain.Member;
+import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
+import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.EntityManager;
+
+import javax.validation.*;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
+    private static ValidatorFactory factory;
+    private static Validator validator;
 
     Member          member;
     BoardCategory   boardCategory;
@@ -30,6 +36,13 @@ class BoardTest {
         boardCategoryFail = "notype";
         contentFail = "hello";
         titleFail = "no";
+        factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    @AfterAll
+    public static void close() {
+        factory.close();
     }
 
     @Test
@@ -43,21 +56,61 @@ class BoardTest {
         assertThat(board.getBoardCategory()).isEqualTo(boardCategory);
         assertThat(board.getContent()).isEqualTo(content);
         assertThat(board.getTitle()).isEqualTo(title);
+
+        Set<ConstraintViolation<Board>> validate = validator.validate(board);
+
+        assertThat(validate).isEmpty();
+
     }
 
-    //해당 처리에 있어 빌더에도 FORM 만 받던지 해야하는 것인가
-//    @Test
-//    public void boardCreateFailed() throws Exception{
-//        Board           board = Board.builder()
-//                .member(this.member)
-//                .boardCategory(boardCategory)
-//                .content(contentFail)
-//                .title(titleFail)
-//                .build();
-//        assertThat(board.getBoardCategory()).isEqualTo(boardCategory);
-//        assertThat(board.getContent()).isEqualTo(content);
-//        assertThat(board.getTitle()).isEqualTo(title);
-//    }
+    @Test
+    public void boardCreateFailed() throws Exception{
+        try {
+
+            Board boardFail1 = Board.builder()
+                    .member(this.member)
+                    .boardCategory(null)
+                    .content(content)
+                    .title(title)
+                    .build();
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).isEqualTo("잘못된 빌더");
+        }
+        Board           boardFail2 = Board.builder()
+                .member(this.member)
+                .boardCategory(boardCategory)
+                .content(contentFail)
+                .title(title)
+                .build();
+        Board           boardFail3 = Board.builder()
+                .member(this.member)
+                .boardCategory(boardCategory)
+                .content(content)
+                .title(titleFail)
+                .build();
+
+        assertThat(validator.validate(boardFail2)).isNotEmpty();
+        assertThat(validator.validate(boardFail3)).isNotEmpty();
+
+    }
+
+    @Test
+    public void boardUpdateSuccess() throws Exception{
+        BoardUpdateDto updateDto = new BoardUpdateDto(BoardCategory.total, "middlefitting", "my name is middlefitting");
+        Board           board = Board.builder()
+                .member(this.member)
+                .boardCategory(boardCategory)
+                .content(content)
+                .title(title)
+                .build();
+
+        board.boardUpdate(updateDto);
+
+        assertThat(board.getTitle()).isEqualTo(updateDto.getTitle());
+        assertThat(board.getContent()).isEqualTo(updateDto.getContent());
+        assertThat(board.getBoardCategory()).isEqualTo(updateDto.getBoardCategory());
+        assertThat(board.getMember()).isEqualTo(member);
+    }
 
     public Member memberSample() {
         return Member.builder()
