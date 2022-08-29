@@ -1,7 +1,7 @@
-package com.practice.springbasic.repository;
+package com.practice.springbasic.repository.member;
 
-import com.practice.springbasic.domain.Member;
-import com.practice.springbasic.domain.dto.MemberDto;
+import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.domain.member.dto.MemberDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

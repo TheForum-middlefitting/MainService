@@ -1,8 +1,9 @@
-package com.practice.springbasic.service;
+package com.practice.springbasic.service.member;
 
-import com.practice.springbasic.domain.Member;
-import com.practice.springbasic.domain.dto.MemberDto;
-import com.practice.springbasic.repository.MemberJpaRepository;
+import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.repository.member.MemberJpaRepository;
+import com.practice.springbasic.service.member.MemberService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,7 +11,7 @@ import java.util.Optional;
 
 @Transactional
 @Service
-public class MemberServiceImpl implements MemberService{
+public class MemberServiceImpl implements MemberService {
 
     private final MemberJpaRepository memberRepository;
 
@@ -57,5 +58,10 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Optional<Member> findMemberByIdAndPassword(long id, String password) {
         return memberRepository.findByIdAndPassword(id, password);
+    }
+
+    @Override
+    public Optional<Member> findMemberById(long id) {
+        return memberRepository.findById(id);
     }
 }

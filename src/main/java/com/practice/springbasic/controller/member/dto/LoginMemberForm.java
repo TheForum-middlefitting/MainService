@@ -1,4 +1,4 @@
-package com.practice.springbasic.controller.utils;
+package com.practice.springbasic.controller.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

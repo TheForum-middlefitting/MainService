@@ -1,6 +1,7 @@
-package com.practice.springbasic.domain;
+package com.practice.springbasic.domain.member;
 
-import com.practice.springbasic.domain.dto.MemberDto;
+import com.practice.springbasic.domain.base.BaseEntity;
+import com.practice.springbasic.domain.member.dto.MemberDto;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
@@ -12,9 +13,9 @@ import javax.validation.constraints.NotEmpty;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
     @NotNull @NotEmpty @Length(min=4, max=20)

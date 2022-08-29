@@ -1,7 +1,7 @@
-package com.practice.springbasic.service;
+package com.practice.springbasic.service.member;
 
-import com.practice.springbasic.domain.Member;
-import com.practice.springbasic.domain.dto.MemberDto;
+import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.domain.member.dto.MemberDto;
 
 import java.util.Optional;
 
@@ -20,4 +20,6 @@ public interface MemberService {
     Boolean duplicateNickname(String nickname);
 
     Optional<Member> findMemberByIdAndPassword(long id, String password);
+
+    Optional<Member> findMemberById(long id);
 }

@@ -1,4 +1,4 @@
-package com.practice.springbasic.domain.dto;
+package com.practice.springbasic.domain.member.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

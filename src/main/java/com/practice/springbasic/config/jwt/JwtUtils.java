@@ -36,7 +36,16 @@ public class JwtUtils {
             throw new RuntimeException();
         }
     }
-
+    public static Long verifyJwtToken(HttpServletRequest request, String tokenType) {
+        String jwtToken = request.getHeader(tokenType).replace(JwtProperties.TOKEN_PREFIX, "");
+        DecodedJWT verify = JWT.require(Algorithm.HMAC512(tokenType.equals(JwtProperties.ACCESS_HEADER_STRING) ? JwtProperties.Access_SECRET : JwtProperties.Refresh_SECRET)).build().verify(jwtToken);
+        return verify.getClaim("id").asLong();
+    }
+    public static String getTokenEmail(HttpServletRequest request, String tokenType) {
+        String jwtToken = request.getHeader(tokenType).replace(JwtProperties.TOKEN_PREFIX, "");
+        DecodedJWT verify = JWT.require(Algorithm.HMAC512(tokenType.equals(JwtProperties.ACCESS_HEADER_STRING) ? JwtProperties.Access_SECRET : JwtProperties.Refresh_SECRET)).build().verify(jwtToken);
+        return verify.getSubject();
+    }
     public static void sameTokenMemberCheck(String accessToken, String refreshToken) {
         String accessId = JWT.decode(accessToken).getClaim("id").toString();
         String refreshId = JWT.decode(refreshToken).getClaim("id").toString();

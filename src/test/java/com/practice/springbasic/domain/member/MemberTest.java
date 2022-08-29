@@ -1,6 +1,7 @@
-package com.practice.springbasic.domain;
+package com.practice.springbasic.domain.member;
 
-import com.practice.springbasic.domain.dto.MemberDto;
+import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.domain.member.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

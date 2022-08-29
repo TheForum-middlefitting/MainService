@@ -1,25 +1,21 @@
 package com.practice.springbasic.domain.board;
 
-import com.practice.springbasic.domain.Member;
+import com.practice.springbasic.domain.base.BaseConstructorEntity;
+import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.sun.istack.NotNull;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
-import org.springframework.util.Assert;
 
 import javax.persistence.*;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.Collection;
-import java.util.Collections;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Board {
+public class Board extends BaseConstructorEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
     private Long id;
     @Enumerated(EnumType.STRING) @NotNull

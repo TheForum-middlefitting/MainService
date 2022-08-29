@@ -1,18 +1,14 @@
 package com.practice.springbasic.controller.member;
 
-import com.practice.springbasic.domain.Member;
-import com.practice.springbasic.domain.dto.MemberDto;
-import com.practice.springbasic.repository.MemberJpaRepository;
-import com.practice.springbasic.service.MemberService;
-import com.practice.springbasic.service.MemberServiceImpl;
-import org.junit.jupiter.api.Assertions;
+import com.practice.springbasic.controller.utils.CheckUtil;
+import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -80,12 +76,12 @@ public class MemberControllerUnitTest {
 
     @Test
     public void bindingResultHaveError() throws Exception{
-        assertThrows(IllegalArgumentException.class, () -> {memberController.bindingResultCheck(true);});
+        assertThrows(IllegalArgumentException.class, () -> {CheckUtil.bindingResultCheck(true);});
     }
 
     @Test
     public void bindingResultDontHaveError() throws Exception{
-        memberController.bindingResultCheck(false);
+        CheckUtil.bindingResultCheck(false);
     }
 
     @Test

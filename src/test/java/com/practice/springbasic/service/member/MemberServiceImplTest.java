@@ -1,9 +1,11 @@
-package com.practice.springbasic.service;
+package com.practice.springbasic.service.member;
 
-import com.practice.springbasic.domain.Member;
-import com.practice.springbasic.domain.dto.MemberDto;
-import com.practice.springbasic.repository.MemberJpaRepository;
+import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.repository.member.MemberJpaRepository;
+import com.practice.springbasic.service.member.MemberServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -18,7 +20,8 @@ import static org.mockito.Mockito.when;
 class MemberServiceImplTest {
 
     @Mock MemberJpaRepository memberRepository;
-    @InjectMocks MemberServiceImpl memberService;
+    @InjectMocks
+    MemberServiceImpl memberService;
     private Member member;
 
     @BeforeEach
@@ -130,6 +133,16 @@ class MemberServiceImplTest {
 
         assertThat(result.orElse(null)).isEqualTo(null);
 
+    }
+
+    @Test
+    @DisplayName("")
+    void findById() {
+        when(memberRepository.findById(1L)).thenReturn(Optional.ofNullable(member));
+
+        Optional<Member> result = memberService.findMemberById(1L);
+
+        assertThat(result.orElse(null)).isEqualTo(member);
     }
 
 

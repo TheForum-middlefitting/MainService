@@ -1,19 +1,16 @@
 package com.practice.springbasic.domain.board;
 
-import com.practice.springbasic.domain.Member;
+import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
-import org.springframework.validation.annotation.Validated;
 
 
 import javax.validation.*;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
     private static ValidatorFactory factory;

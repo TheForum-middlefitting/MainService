@@ -1,9 +1,8 @@
-package com.practice.springbasic.controller.utils;
+package com.practice.springbasic.controller.member.dto;
 
 import lombok.*;
 
 @Getter
-@NoArgsConstructor
 public class ReturnMemberForm {
     Long id;
     String email;

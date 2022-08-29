@@ -1,6 +1,6 @@
-package com.practice.springbasic.repository;
+package com.practice.springbasic.repository.member;
 
-import com.practice.springbasic.domain.Member;
+import com.practice.springbasic.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -4,12 +4,10 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.controller.form.DeleteMemberForm;
-import com.practice.springbasic.controller.member.MemberControllerImpl;
-import com.practice.springbasic.controller.utils.LoginMemberForm;
-import com.practice.springbasic.domain.Member;
-import com.practice.springbasic.domain.dto.MemberDto;
-import com.practice.springbasic.service.MemberService;
+import com.practice.springbasic.controller.member.dto.LoginMemberForm;
+import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -25,9 +23,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -221,14 +217,12 @@ class MemberControllerImplTest {
     @Test
     public void deleteMemberSuccess() throws Exception{
         when(memberService.findMemberByIdAndPassword(1L, member.getPassword())).thenReturn(Optional.ofNullable(member));
-        DeleteMemberForm memberForm = new DeleteMemberForm(member.getPassword());
-        String content = objectMapper.writeValueAsString(memberForm);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
-        ResultActions resultActions = makeDeleteResultActions("/members/1", content, jwtToken);
+        ResultActions resultActions = makeDeleteResultActions("/members/1/%middlefitting", jwtToken);
 
         resultActions
                 .andExpect(status().isOk())
@@ -237,10 +231,9 @@ class MemberControllerImplTest {
                 .andExpect(jsonPath("$.data", equalTo(null)));
     }
 
-    ResultActions makeDeleteResultActions(String url, String content, String jwtToken) throws Exception {
+    ResultActions makeDeleteResultActions(String url, String jwtToken) throws Exception {
         return mockMvc.perform(delete(url)
                         .header("Authorization", jwtToken)
-                        .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
