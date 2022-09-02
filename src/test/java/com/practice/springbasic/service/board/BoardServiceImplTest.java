@@ -4,7 +4,7 @@ import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.repository.board.BoardJpaRepository;
+import com.practice.springbasic.repository.board.BoardRepository;
 import com.practice.springbasic.service.board.dto.BoardDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 class BoardServiceImplTest {
 
     @Mock
-    BoardJpaRepository boardRepository;
+    BoardRepository boardRepository;
 
     @InjectMocks
     BoardServiceImpl boardService;

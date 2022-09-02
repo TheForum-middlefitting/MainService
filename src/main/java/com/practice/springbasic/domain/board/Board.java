@@ -1,6 +1,7 @@
 package com.practice.springbasic.domain.board;
 
 import com.practice.springbasic.domain.base.BaseConstructorEntity;
+import com.practice.springbasic.domain.base.BaseEntity;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.sun.istack.NotNull;

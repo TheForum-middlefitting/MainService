@@ -3,7 +3,7 @@ package com.practice.springbasic.service.board;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.repository.board.BoardJpaRepository;
+import com.practice.springbasic.repository.board.BoardRepository;
 import com.practice.springbasic.service.board.dto.BoardDto;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +13,9 @@ import java.util.Optional;
 @Service
 @Transactional
 public class BoardServiceImpl implements BoardService{
-    private final BoardJpaRepository boardRepository;
+    private final BoardRepository boardRepository;
 
-    public BoardServiceImpl(BoardJpaRepository boardRepository) {
+    public BoardServiceImpl(BoardRepository boardRepository) {
         this.boardRepository = boardRepository;
     }
 
