@@ -2,7 +2,9 @@ package com.practice.springbasic.repository.board;
 
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
 import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
+import com.practice.springbasic.repository.board.dto.QBoardPageDto;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -42,22 +44,38 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom{
         return new OrderSpecifier<>(Order.ASC, board.regDate);
     }
     @Override
-    public Page<Board> findBoardPage(Pageable pageable, BoardPageSearchCondition condition) {
-        List<Board> content = queryFactory
-                .select(board)
+    public Page<BoardPageDto> findBoardPage(Pageable pageable, BoardPageSearchCondition condition) {
+        List<BoardPageDto> content = queryFactory
+                .select(new QBoardPageDto(
+                        board.id,
+                        board.boardCategory,
+                        board.title,
+                        board.member.id,
+                        board.member.nickname
+                        )
+                )
                 .from(board)
-                .where(board.id.goe(0L), boardWriterNicknameContains(condition.getBoardWriterNickname()),
-                boardTitleContains(condition.getBoardTitle()), boardContentContains(condition.getBoardContent()),
-                boardCategoryEq(condition.getBoardCategory()))
+                .where(
+                        board.id.goe(0L),
+                        boardWriterNicknameContains(condition.getBoardWriterNickname()),
+                        boardTitleContains(condition.getBoardTitle()),
+                        boardContentContains(condition.getBoardContent()),
+                        boardCategoryEq(condition.getBoardCategory())
+                )
                 .orderBy(boardSort(pageable))
-                .offset(1)
+                .offset(pageable.getPageNumber() * 10L)
                 .limit(10)
                 .fetch();
         JPAQuery<Board> countQuery = queryFactory
                 .selectFrom(board)
-                .where(board.id.goe(0L), boardWriterNicknameContains(condition.getBoardWriterNickname()),
-                        boardTitleContains(condition.getBoardTitle()), boardContentContains(condition.getBoardContent()),
-                        boardCategoryEq(condition.getBoardCategory()));
+                .where(
+                        board.id.goe(0L),
+                        boardWriterNicknameContains(condition.getBoardWriterNickname()),
+                        boardTitleContains(condition.getBoardTitle()),
+                        boardContentContains(condition.getBoardContent()),
+                        boardCategoryEq(condition.getBoardCategory()))
+                .offset(pageable.getPageNumber() * 10L)
+                .limit(100);
         return PageableExecutionUtils.getPage(content, pageable, countQuery.fetch()::size);
     }
 

@@ -4,7 +4,11 @@ import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.repository.board.BoardRepository;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
+import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.dto.BoardDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -45,5 +49,10 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public void deleteBoard(Board board) {
         boardRepository.delete(board);
+    }
+
+    @Override
+    public Page<BoardPageDto> findBoardPage(Pageable pageable, BoardPageSearchCondition condition) {
+        return boardRepository.findBoardPage(pageable, condition);
     }
 }

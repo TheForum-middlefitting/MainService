@@ -10,15 +10,20 @@ import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
+import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.board.dto.BoardDto;
 import com.practice.springbasic.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -134,6 +139,27 @@ class BoardControllerImplTest {
     }
 
     @Test
+    @DisplayName("updateBoardFailedByDifferentEmail")
+    void updateBoardFailedByDifferentEmail() throws Exception{
+        when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
+        when(boardService.updateBoard(any(Board.class), any(BoardUpdateDto.class))).thenReturn(updatedBoard);
+        String jwtToken = JWT.create()
+                .withSubject("Different" + member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withClaim("id", 1)
+                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+
+        String content = objectMapper.writeValueAsString(boardDto);
+
+        ResultActions resultActions = makePutResultActions("/boards/1", content, jwtToken);
+
+        resultActions
+                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
+    }
+
+    @Test
     @DisplayName("deleteBoardSuccess")
     void deleteBoardSuccess() throws Exception{
         when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
@@ -148,6 +174,42 @@ class BoardControllerImplTest {
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
                 .andExpect(jsonPath("$.status").value(200));
+    }
+
+    @Test
+    @DisplayName("deleteBoardSuccess")
+    void deleteBoardFailedByDifferentEmail() throws Exception{
+        when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
+        String jwtToken = JWT.create()
+                .withSubject("Different" + member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withClaim("id", 1)
+                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+
+        ResultActions resultActions = makeDeleteResultActions("/boards/1", jwtToken);
+
+        resultActions
+                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
+    }
+    @Test
+    @DisplayName("findBoardPageSuccess")
+    void findBoardPageSuccess() throws Exception{
+        BoardPageSearchCondition condition = new BoardPageSearchCondition();
+        String content = objectMapper.writeValueAsString(condition);
+        String jwtToken = JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withClaim("id", 1)
+                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+
+        ResultActions resultActions = makePostResultActions("/boards/offset/", content, jwtToken);
+
+        resultActions
+                .andExpect(jsonPath("$.message", equalTo("success")))
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data", equalTo(null)));
     }
 
     private Board boardSample(BoardCategory boardCategory, String title, String content, Member member) {

@@ -8,9 +8,15 @@ import com.practice.springbasic.controller.form.SuccessResult;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
+import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.board.dto.BoardDto;
 import com.practice.springbasic.service.member.MemberService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -75,5 +81,13 @@ public class BoardControllerImpl implements BoardController{
         }
         boardService.deleteBoard(board);
         return new SuccessResult(null);
+    }
+
+    @Override
+    @PostMapping("boards/offset/")
+    public SuccessResult searchBoardPage(@PageableDefault(page = 0, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestBody @Validated BoardPageSearchCondition condition, BindingResult bindingResult) {
+        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
+        Page<BoardPageDto> boardPage = boardService.findBoardPage(pageable, condition);
+        return new SuccessResult(boardPage);
     }
 }

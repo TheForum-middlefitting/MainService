@@ -3,8 +3,8 @@ package com.practice.springbasic.repository.board;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
 import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -89,16 +89,13 @@ class BoardRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
         BoardPageSearchCondition condition = new BoardPageSearchCondition();
 
-        Page<Board> result = boardRepository.findBoardPage(pageable, condition);
+        Page<BoardPageDto> result = boardRepository.findBoardPage(pageable, condition);
 
         assertThat(result).extracting("title")
-                .containsExactly(board2.getTitle(), board3.getTitle(), board4.getTitle(), board5.getTitle(), board6.getTitle(),
-                        board7.getTitle(), board8.getTitle(), board9.getTitle(), board10.getTitle(), board11.getTitle());
-        assertThat(result).extracting("member")
-                .contains(member1, member2, member3);
-        assertThat(result).extracting("content")
-                .containsExactly(board2.getContent(), board3.getContent(), board4.getContent(), board5.getContent(), board6.getContent(),
-                        board7.getContent(), board8.getContent(), board9.getContent(), board10.getContent(), board11.getContent());
+                .containsExactly(board1.getTitle(), board2.getTitle(), board3.getTitle(), board4.getTitle(), board5.getTitle(), board6.getTitle(),
+                        board7.getTitle(), board8.getTitle(), board9.getTitle(), board10.getTitle());
+        assertThat(result).extracting("memberId")
+                .contains(member1.getId(), member2.getId());
         assertThat(result.getTotalPages()).isEqualTo(2L);
         assertThat(result.getTotalElements()).isEqualTo(11L);
     }
@@ -109,16 +106,13 @@ class BoardRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.Direction.ASC,  "regDate");
         BoardPageSearchCondition condition = new BoardPageSearchCondition();
 
-        Page<Board> result = boardRepository.findBoardPage(pageable, condition);
+        Page<BoardPageDto> result = boardRepository.findBoardPage(pageable, condition);
 
         assertThat(result).extracting("title")
-                .containsExactly(board2.getTitle(), board3.getTitle(), board4.getTitle(), board5.getTitle(), board6.getTitle(),
-                        board7.getTitle(), board8.getTitle(), board9.getTitle(), board10.getTitle(), board11.getTitle());
-        assertThat(result).extracting("member")
-                .contains(member1, member2, member3);
-        assertThat(result).extracting("content")
-                .containsExactly(board2.getContent(), board3.getContent(), board4.getContent(), board5.getContent(), board6.getContent(),
-                        board7.getContent(), board8.getContent(), board9.getContent(), board10.getContent(), board11.getContent());
+                .containsExactly(board1.getTitle(), board2.getTitle(), board3.getTitle(), board4.getTitle(), board5.getTitle(), board6.getTitle(),
+                        board7.getTitle(), board8.getTitle(), board9.getTitle(), board10.getTitle());
+        assertThat(result).extracting("memberId")
+                .contains(member1.getId(), member2.getId());
         assertThat(result.getTotalPages()).isEqualTo(2L);
         assertThat(result.getTotalElements()).isEqualTo(11L);
     }
@@ -129,16 +123,13 @@ class BoardRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC,  "regDate");
         BoardPageSearchCondition condition = new BoardPageSearchCondition();
 
-        Page<Board> result = boardRepository.findBoardPage(pageable, condition);
+        Page<BoardPageDto> result = boardRepository.findBoardPage(pageable, condition);
 
         assertThat(result).extracting("title")
-                .containsExactly(board10.getTitle(), board9.getTitle(), board8.getTitle(), board7.getTitle(), board6.getTitle(), board5.getTitle(),
-                        board4.getTitle(), board3.getTitle(), board2.getTitle(), board1.getTitle());
-        assertThat(result).extracting("member")
-                .contains(member1, member2);
-        assertThat(result).extracting("content")
-                .containsExactly(board10.getContent(), board9.getContent(), board8.getContent(), board7.getContent(), board6.getContent(), board5.getContent(),
-                        board4.getContent(), board3.getContent(), board2.getContent(), board1.getContent());
+                .containsExactly(board11.getTitle(), board10.getTitle(), board9.getTitle(), board8.getTitle(), board7.getTitle(), board6.getTitle(), board5.getTitle(),
+                        board4.getTitle(), board3.getTitle(), board2.getTitle());
+        assertThat(result).extracting("memberId")
+                .contains(member1.getId(), member2.getId(), member3.getId());
         assertThat(result.getTotalPages()).isEqualTo(2L);
         assertThat(result.getTotalElements()).isEqualTo(11L);
     }
@@ -151,14 +142,12 @@ class BoardRepositoryTest {
                 .boardCategory(BoardCategory.free)
                 .build();
 
-        Page<Board> result = boardRepository.findBoardPage(pageable, condition);
+        Page<BoardPageDto> result = boardRepository.findBoardPage(pageable, condition);
 
         assertThat(result).extracting("title")
                 .containsExactly(board5.getTitle(), board4.getTitle(), board3.getTitle(), board2.getTitle(), board1.getTitle());
-        assertThat(result).extracting("member")
-                .contains(member1, member2);
-        assertThat(result).extracting("content")
-                .containsExactly(board5.getContent(), board4.getContent(), board3.getContent(), board2.getContent(), board1.getContent());
+        assertThat(result).extracting("memberId")
+                .contains(member1.getId());
         assertThat(result.getTotalPages()).isEqualTo(1L);
         assertThat(result.getTotalElements()).isEqualTo(5L);
     }
@@ -169,17 +158,21 @@ class BoardRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC,  "regDate");
         BoardPageSearchCondition condition = BoardPageSearchCondition.builder()
                 .boardCategory(BoardCategory.total)
-                .boardWriterNickname("member3")
+                .boardWriterNickname("member1")
                 .build();
 
-        Page<Board> result = boardRepository.findBoardPage(pageable, condition);
+        Page<BoardPageDto> result = boardRepository.findBoardPage(pageable, condition);
 
+        assertThat(result).extracting("boardId")
+                .containsExactly(board5.getId(), board4.getId(), board3.getId(), board2.getId(), board1.getId());
+        assertThat(result).extracting("boardCategory")
+                .containsExactly(board5.getBoardCategory(), board4.getBoardCategory(), board3.getBoardCategory(), board2.getBoardCategory(), board1.getBoardCategory());
         assertThat(result).extracting("title")
                 .containsExactly(board5.getTitle(), board4.getTitle(), board3.getTitle(), board2.getTitle(), board1.getTitle());
-        assertThat(result).extracting("member")
-                .contains(member1);
-        assertThat(result).extracting("content")
-                .containsExactly(board5.getContent(), board4.getContent(), board3.getContent(), board2.getContent(), board1.getContent());
+        assertThat(result).extracting("nickname")
+                .contains(member1.getNickname());
+        assertThat(result).extracting("memberId")
+                        .contains(member1.getId());
         assertThat(result.getTotalPages()).isEqualTo(1L);
         assertThat(result.getTotalElements()).isEqualTo(5L);
     }

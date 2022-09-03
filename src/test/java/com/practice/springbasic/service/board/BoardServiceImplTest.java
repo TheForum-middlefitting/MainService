@@ -5,13 +5,21 @@ import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.repository.board.BoardRepository;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
+import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.dto.BoardDto;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.Optional;
 
@@ -26,6 +34,7 @@ class BoardServiceImplTest {
 
     @InjectMocks
     BoardServiceImpl boardService;
+
 
     private Board board;
     private Member member;
@@ -81,6 +90,19 @@ class BoardServiceImplTest {
         Board result = boardService.updateBoard(board, updateBoardDto);
 
         assertThat(result).isEqualTo(board);
+    }
+
+    @Test
+    @DisplayName("findBoardPageSuccess")
+    void findBoardPageSuccess() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC,  "regDate");
+        BoardPageSearchCondition condition = new BoardPageSearchCondition();
+        Page<BoardPageDto> mockPage = Mockito.mock(Page.class);
+        when(boardRepository.findBoardPage(pageable, condition)).thenReturn(mockPage);
+
+        Page<BoardPageDto> result = boardService.findBoardPage(pageable, condition);
+
+        assertThat(result.getClass().getName()).isEqualTo(mockPage.getClass().getName());
     }
 
     @Test
