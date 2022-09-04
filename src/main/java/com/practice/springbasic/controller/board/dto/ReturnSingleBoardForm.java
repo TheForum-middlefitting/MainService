@@ -2,13 +2,7 @@ package com.practice.springbasic.controller.board.dto;
 
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
-import com.sun.istack.NotNull;
 import lombok.Getter;
-import org.hibernate.validator.constraints.Length;
-
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.validation.constraints.NotEmpty;
 
 @Getter
 public class ReturnSingleBoardForm {

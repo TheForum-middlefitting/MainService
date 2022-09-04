@@ -8,7 +8,6 @@ import com.practice.springbasic.repository.board.BoardRepository;
 import com.practice.springbasic.repository.board.dto.BoardPageDto;
 import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.dto.BoardDto;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

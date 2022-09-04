@@ -2,8 +2,10 @@ package com.practice.springbasic.domain.board.dto;
 
 import com.practice.springbasic.domain.board.BoardCategory;
 import com.sun.istack.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.EnumType;
@@ -12,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BoardUpdateDto {
     @Enumerated(EnumType.STRING) @NotNull
     BoardCategory boardCategory;

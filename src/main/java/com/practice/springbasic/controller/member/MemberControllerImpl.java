@@ -33,8 +33,8 @@ public class MemberControllerImpl implements MemberController{
         duplicateNicknameCheck(member.getNickname());
         memberService.join(member);
 
-        String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getPassword());
-        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getPassword());
+        String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
+        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
         response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
         response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
         return new SuccessResult(createMemberForm(member));
@@ -48,8 +48,8 @@ public class MemberControllerImpl implements MemberController{
         memberNullCheck(member);
         assert member != null;
 
-        String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getPassword());
-        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getPassword());
+        String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
+        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
         response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
         response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
         return new SuccessResult(createMemberForm(member));

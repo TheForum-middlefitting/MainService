@@ -1,4 +1,4 @@
-package com.practice.springbasic.controller.board;
+package com.practice.springbasic.controller.comment;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
-import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
+import com.practice.springbasic.domain.comment.Comment;
+import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.domain.member.dto.MemberDto;
-import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
-import com.practice.springbasic.service.board.dto.BoardDto;
+import com.practice.springbasic.service.comment.CommentService;
+import com.practice.springbasic.service.comment.dto.CommentDto;
 import com.practice.springbasic.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,8 +33,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(BoardControllerImpl.class)
-class BoardControllerImplTest {
+@WebMvcTest(CommentControllerImpl.class)
+class CommentControllerImplTest {
     @Autowired
     MockMvc mockMvc;
 
@@ -42,109 +42,108 @@ class BoardControllerImplTest {
     MemberService memberService;
     @MockBean
     BoardService boardService;
+    @MockBean
+    CommentService commentService;
 
     @Autowired
     ObjectMapper objectMapper;
 
     private Member member;
     private Board board;
-    private BoardDto boardDto;
+    private Comment comment;
+    private CommentDto commentDto;
 
-    private BoardUpdateDto boardUpdateDto;
-    private Board updatedBoard;
+    private CommentUpdateDto commentUpdateDto;
+    private Comment updatedComment;
 
     @BeforeEach
-    public void createBoard() {
+    public void createComment() {
         member = memberSample("middlefitting@google.com", "%middlefitting", "middlefitting");
         board = boardSample(BoardCategory.free, "hello world", "Hello my name is middlefitting", member);
-        boardDto = new BoardDto(board.getBoardCategory(), board.getTitle(), board.getContent());
-        boardUpdateDto = new BoardUpdateDto(BoardCategory.total, "world hello", "hello my board update");
-        updatedBoard = boardSample(boardUpdateDto.getBoardCategory(), boardUpdateDto.getTitle(), boardUpdateDto.getContent(), member);
+        comment = commentSample("hello comment!", member, board);
+        commentDto = new CommentDto(comment.getContent());
+        commentUpdateDto = new CommentUpdateDto("hello my comment update");
+        updatedComment = commentSample(comment.getContent(), member, board);
     }
 
     @Test
-    @DisplayName("postBoardSuccess")
-    void postBordSuccess() throws Exception {
+    @DisplayName("postCommentSuccess")
+    void postCommentSuccess() throws Exception {
         when(memberService.findMemberById(1L)).thenReturn(Optional.ofNullable(member));
-        when(boardService.postBoard(any(Member.class), any(BoardDto.class))).thenReturn(board);
+        when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
+        when(commentService.postComment(any(Member.class), any(Board.class), any(CommentDto.class))).thenReturn(comment);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
-        String content = objectMapper.writeValueAsString(boardDto);
+        String content = objectMapper.writeValueAsString(commentDto);
 
-        ResultActions resultActions = makePostResultActions("/boards", content, jwtToken);
-
-        resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.boardId", equalTo(null)))
-                .andExpect(jsonPath("$.data.boardCategory").value(boardDto.getBoardCategory().toString()))
-                .andExpect(jsonPath("$.data.title").value(boardDto.getTitle()))
-                .andExpect(jsonPath("$.data.content").value(board.getContent()))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
-    }
-
-    @Test
-    @DisplayName("findSingleBoardSuccess")
-    void findSingleBoardSuccess() throws Exception{
-        when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
-
-        ResultActions resultActions = makeGetResultActions("/boards/1");
+        ResultActions resultActions = makePostResultActions("/boards/1/comments", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.boardId", equalTo(null)))
-                .andExpect(jsonPath("$.data.boardCategory").value(boardDto.getBoardCategory().toString()))
-                .andExpect(jsonPath("$.data.title").value(boardDto.getTitle()))
-                .andExpect(jsonPath("$.data.content").value(board.getContent()))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+                .andExpect(jsonPath("$.data.commentId", equalTo(null)))
+                .andExpect(jsonPath("$.data.content").value(comment.getContent()))
+                .andExpect(jsonPath("$.data.nickname").value(comment.getMember().getNickname()))
+                .andExpect(jsonPath("$.data.email").value(comment.getMember().getEmail()));
     }
 
     @Test
-    @DisplayName("updateBoardSuccess")
-    void updateBoardSuccess() throws Exception{
-        when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
-        when(boardService.updateBoard(any(Board.class), any(BoardUpdateDto.class))).thenReturn(updatedBoard);
+    @DisplayName("findSingleCommentSuccess")
+    void findSingleCommentSuccess() throws Exception{
+        when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
+
+        ResultActions resultActions = makeGetResultActions("/boards/1/comments/1");
+
+        resultActions
+                .andExpect(jsonPath("$.message", equalTo("success")))
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data.commentId", equalTo(null)))
+                .andExpect(jsonPath("$.data.content").value(comment.getContent()))
+                .andExpect(jsonPath("$.data.nickname").value(comment.getMember().getNickname()))
+                .andExpect(jsonPath("$.data.email").value(comment.getMember().getEmail()));
+    }
+
+    @Test
+    @DisplayName("updateCommentSuccess")
+    void updateCommentSuccess() throws Exception{
+        when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
+        when(commentService.updateComment(any(Comment.class), any(CommentUpdateDto.class))).thenReturn(updatedComment);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        String content = objectMapper.writeValueAsString(boardDto);
+        String content = objectMapper.writeValueAsString(commentDto);
 
-        ResultActions resultActions = makePutResultActions("/boards/1", content, jwtToken);
+        ResultActions resultActions = makePutResultActions("/boards/1/comments/1", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.boardId", equalTo(null)))
-                .andExpect(jsonPath("$.data.boardCategory").value(boardUpdateDto.getBoardCategory().toString()))
-                .andExpect(jsonPath("$.data.title").value(boardUpdateDto.getTitle()))
-                .andExpect(jsonPath("$.data.content").value(updatedBoard.getContent()))
+                .andExpect(jsonPath("$.data.content").value(updatedComment.getContent()))
                 .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.data.email").value(member.getEmail()));
     }
 
     @Test
-    @DisplayName("updateBoardFailedByDifferentEmail")
-    void updateBoardFailedByDifferentEmail() throws Exception{
-        when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
-        when(boardService.updateBoard(any(Board.class), any(BoardUpdateDto.class))).thenReturn(updatedBoard);
+    @DisplayName("updateCommentFailedByDifferentEmail")
+    void updateCommentFailedByDifferentEmail() throws Exception{
+        when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
+        when(commentService.updateComment(any(Comment.class), any(CommentUpdateDto.class))).thenReturn(updatedComment);
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        String content = objectMapper.writeValueAsString(boardDto);
+        String content = objectMapper.writeValueAsString(commentDto);
 
-        ResultActions resultActions = makePutResultActions("/boards/1", content, jwtToken);
+        ResultActions resultActions = makePutResultActions("/boards/1/comments/1", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
@@ -153,51 +152,16 @@ class BoardControllerImplTest {
     }
 
     @Test
-    @DisplayName("deleteBoardSuccess")
-    void deleteBoardSuccess() throws Exception{
-        when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
+    @DisplayName("deleteCommentSuccess")
+    void deleteCommentSuccess() throws Exception{
+        when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        ResultActions resultActions = makeDeleteResultActions("/boards/1", jwtToken);
-
-        resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200));
-    }
-
-    @Test
-    @DisplayName("deleteBoardFailedByDifferentEmail")
-    void deleteBoardFailedByDifferentEmail() throws Exception{
-        when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
-        String jwtToken = JWT.create()
-                .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
-                .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
-
-        ResultActions resultActions = makeDeleteResultActions("/boards/1", jwtToken);
-
-        resultActions
-                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
-                .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
-    }
-    @Test
-    @DisplayName("findBoardPageSuccess")
-    void findBoardPageSuccess() throws Exception{
-        BoardPageSearchCondition condition = new BoardPageSearchCondition();
-        String content = objectMapper.writeValueAsString(condition);
-        String jwtToken = JWT.create()
-                .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
-                .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
-
-        ResultActions resultActions = makePostResultActions("/boards/offset/", content, jwtToken);
+        ResultActions resultActions = makeDeleteResultActions("/boards/1/comments/1", jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -205,6 +169,31 @@ class BoardControllerImplTest {
                 .andExpect(jsonPath("$.data", equalTo(null)));
     }
 
+    @Test
+    @DisplayName("deleteCommentFailedByDifferentEmail")
+    void deleteCommentFailedByDifferentEmail() throws Exception{
+        when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
+        String jwtToken = JWT.create()
+                .withSubject("Different" + member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withClaim("id", 1)
+                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+
+        ResultActions resultActions = makeDeleteResultActions("/boards/1/comments/1", jwtToken);
+
+        resultActions
+                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
+    }
+
+    private Comment commentSample(String content, Member member, Board board) {
+        return Comment.builder()
+                .content(content)
+                .member(member)
+                .board(board)
+                .build();
+    }
     private Board boardSample(BoardCategory boardCategory, String title, String content, Member member) {
         return Board.builder()
                 .boardCategory(boardCategory)
@@ -219,14 +208,6 @@ class BoardControllerImplTest {
                 .email(email)
                 .password(password)
                 .nickname(nickname)
-                .build();
-    }
-
-    private MemberDto memberDtoSample() {
-        return MemberDto.builder()
-                .email("middlefitting@google.com")
-                .password("%middlefitting")
-                .nickname("middlefitting2")
                 .build();
     }
     ResultActions makePostResultActions(String url, String content, String jwtToken) throws Exception {
@@ -261,4 +242,5 @@ class BoardControllerImplTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
+
 }
