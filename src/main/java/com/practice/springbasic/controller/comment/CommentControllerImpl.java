@@ -9,10 +9,18 @@ import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
 import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
+import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
+import com.practice.springbasic.repository.comment.dto.CommentPageDto;
+import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.comment.CommentService;
 import com.practice.springbasic.service.comment.dto.CommentDto;
 import com.practice.springbasic.service.member.MemberService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +85,14 @@ public class CommentControllerImpl implements CommentController{
         memberEmailAndCommentEmailSameCheck(email, comment);
         commentService.deleteComment(comment);
         return new SuccessResult(null);
+    }
+    @Override
+    @PostMapping("/boards/{boardId}/comments/next/")
+    public SuccessResult searchCommentPage(@PageableDefault(page = 0, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+                                           @PathVariable Long boardId, @RequestBody @Validated CommentPageSearchCondition condition, BindingResult bindingResult) {
+        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
+        Page<CommentPageDto> commentPage = commentService.findCommentPage(pageable, condition, boardId);
+        return new SuccessResult(commentPage);
     }
     private static void memberEmailAndCommentEmailSameCheck(String email, Comment comment) {
         if(!email.equals(comment.getMember().getEmail())) {

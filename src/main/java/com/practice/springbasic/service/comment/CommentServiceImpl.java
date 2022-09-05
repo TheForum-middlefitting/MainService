@@ -5,7 +5,11 @@ import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.repository.comment.CommentRepository;
+import com.practice.springbasic.repository.comment.dto.CommentPageDto;
+import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
 import com.practice.springbasic.service.comment.dto.CommentDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -45,6 +49,11 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public void deleteComment(Comment comment) {
         commentRepository.delete(comment);
+    }
+
+    @Override
+    public Page<CommentPageDto> findCommentPage(Pageable pageable, CommentPageSearchCondition condition, long boardId) {
+        return commentRepository.findCommentPage(pageable, condition, boardId);
     }
 
 }

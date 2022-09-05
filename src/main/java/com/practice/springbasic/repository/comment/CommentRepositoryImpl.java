@@ -1,11 +1,9 @@
 package com.practice.springbasic.repository.comment;
 
-import com.practice.springbasic.domain.board.Board;
-import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.comment.Comment;
-import com.practice.springbasic.repository.board.dto.BoardPageDto;
-import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
-import com.practice.springbasic.repository.board.dto.QBoardPageDto;
+import com.practice.springbasic.repository.comment.dto.CommentPageDto;
+import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
+import com.practice.springbasic.repository.comment.dto.QCommentPageDto;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -19,9 +17,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.practice.springbasic.domain.board.QBoard.board;
 import static com.practice.springbasic.domain.comment.QComment.comment;
-import static org.springframework.util.StringUtils.hasText;
 
 public class CommentRepositoryImpl implements CommentRepositoryCustom{
     private final JPAQueryFactory queryFactory;
@@ -31,67 +27,48 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
     }
 
     private OrderSpecifier<?> commentSort(Pageable pageable) {
-        if (!pageable.getSort().isEmpty()) {
-            for (Sort.Order order : pageable.getSort()) {
-                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
-                switch (order.getProperty()){
-                    default:
-                        return new OrderSpecifier<>(direction, comment.regDate);
-                }
-            }
-        }
-        return new OrderSpecifier<>(Order.ASC, board.regDate);
+//        if (!pageable.getSort().isEmpty()) {
+//            for (Sort.Order order : pageable.getSort()) {
+//                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+//                switch (order.getProperty()){
+//                    default:
+//                        return new OrderSpecifier<>(direction, comment.regDate);
+//                }
+//            }
+//        }
+        return new OrderSpecifier<>(Order.DESC, comment.regDate);
     }
     @Override
-    public Page<CommentPageDto> findCommentPage(Pageable pageable) {
+    public Page<CommentPageDto> findCommentPage(Pageable pageable, CommentPageSearchCondition condition, Long boardId) {
         List<CommentPageDto> content = queryFactory
-                .select(new QBoardPageDto(
-                                board.id,
-                                board.boardCategory,
-                                board.title,
-                                board.member.id,
-                                board.member.nickname
+                .select(new QCommentPageDto(
+                                comment.id,
+                                comment.content,
+                                comment.board.id,
+                                comment.member.id,
+                                comment.member.nickname,
+                                comment.member.email
                         )
                 )
-                .from(board)
+                .from(comment)
                 .where(
-                        board.id.goe(0L),
-                        boardWriterNicknameContains(condition.getBoardWriterNickname()),
-                        boardTitleContains(condition.getBoardTitle()),
-                        boardContentContains(condition.getBoardContent()),
-                        boardCategoryEq(condition.getBoardCategory())
+                        ltCommentId(condition.getCommentId()),
+                        comment.board.id.eq(boardId)
                 )
-                .orderBy(boardSort(pageable))
-                .offset(pageable.getPageNumber() * 10L)
+                .orderBy(commentSort(pageable))
                 .limit(10)
                 .fetch();
-        JPAQuery<Board> countQuery = queryFactory
-                .selectFrom(board)
+        JPAQuery<Comment> countQuery = queryFactory
+                .selectFrom(comment)
                 .where(
-                        board.id.goe(0L),
-                        boardWriterNicknameContains(condition.getBoardWriterNickname()),
-                        boardTitleContains(condition.getBoardTitle()),
-                        boardContentContains(condition.getBoardContent()),
-                        boardCategoryEq(condition.getBoardCategory()))
-                .offset(pageable.getPageNumber() * 10L)
-                .limit(100);
+                        ltCommentId(condition.getCommentId()),
+                        comment.board.id.eq(boardId)
+                )
+                .limit(10);
         return PageableExecutionUtils.getPage(content, pageable, countQuery.fetch()::size);
     }
 
-
-    private BooleanExpression boardWriterNicknameContains(String boardWriterNickname) {
-        return hasText(boardWriterNickname) ?  board.member.nickname.contains(boardWriterNickname) : null;
-    }
-    private BooleanExpression boardTitleContains(String boardTitle) {
-        return hasText(boardTitle) ?  board.title.contains(boardTitle) : null;
-    }
-    private BooleanExpression boardContentContains(String boardContent) {
-        return hasText(boardContent) ?  board.content.contains(boardContent) : null;
-    }
-    private BooleanExpression boardCategoryEq(BoardCategory boardCategory) {
-        if (boardCategory.equals(BoardCategory.free) || boardCategory.equals(BoardCategory.notice)) {
-            return board.boardCategory.eq(BoardCategory.valueOf(String.valueOf(boardCategory)));
-        }
-        return null;
+    private BooleanExpression ltCommentId(Long commentId) {
+        return commentId == null ?  null : comment.id.lt(commentId);
     }
 }

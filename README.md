@@ -15,9 +15,9 @@
 - Jwt Exception(2022/08/17)
 - Board API(2022/09/03)
 - Board Exception(2022/09/03)
-- Comment API(2022/09/03~)
-- Comment Exception
-- Admin Rest API
+- Comment API(2022/09/05)
+- Comment Exception(2022/09/05)
+- Admin Rest API(2022/09/05~)
 - Admin Exception
 - Client Rendering
 - Admin Rendering

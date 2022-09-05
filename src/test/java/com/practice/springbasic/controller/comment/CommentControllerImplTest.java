@@ -9,6 +9,8 @@ import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
 import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
+import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.comment.CommentService;
 import com.practice.springbasic.service.comment.dto.CommentDto;
@@ -186,7 +188,24 @@ class CommentControllerImplTest {
                 .andExpect(jsonPath("$.status").value(403))
                 .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
     }
+    @Test
+    @DisplayName("findCommentPageSuccess")
+    void findCommentPageSuccess() throws Exception{
+        CommentPageSearchCondition condition = new CommentPageSearchCondition(1L);
+        String content = objectMapper.writeValueAsString(condition);
+        String jwtToken = JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withClaim("id", 1)
+                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
+        ResultActions resultActions = makePostResultActions("/boards/1/comments/next/", content, jwtToken);
+
+        resultActions
+                .andExpect(jsonPath("$.message", equalTo("success")))
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data", equalTo(null)));
+    }
     private Comment commentSample(String content, Member member, Board board) {
         return Comment.builder()
                 .content(content)

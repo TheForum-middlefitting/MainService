@@ -5,14 +5,23 @@ import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
 import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
+import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.repository.comment.CommentRepository;
+import com.practice.springbasic.repository.comment.dto.CommentPageDto;
+import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
 import com.practice.springbasic.service.comment.dto.CommentDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.Optional;
 
@@ -86,6 +95,19 @@ class CommentServiceImplTest {
         Comment result = commentService.updateComment(comment, updateCommentDto);
 
         assertThat(result.getContent()).isEqualTo(compareComment.getContent());
+    }
+
+    @Test
+    @DisplayName("findCommentPageSuccess")
+    void findCommentPageSuccess() {
+        Pageable pageable = PageRequest.of(0, 10);
+        CommentPageSearchCondition condition = new CommentPageSearchCondition(null);
+        Page<CommentPageDto> mockPage = Mockito.mock(Page.class);
+        when(commentRepository.findCommentPage(pageable, condition, 1L)).thenReturn(mockPage);
+
+        Page<CommentPageDto> result = commentService.findCommentPage(pageable, condition, 1L);
+
+        assertThat(result.getClass().getName()).isEqualTo(mockPage.getClass().getName());
     }
 
     @Test
