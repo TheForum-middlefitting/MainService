@@ -3,7 +3,7 @@
 ## Project Describe
 - Web page
 - Monolithic architecture
-- Client side rendering with thymeleaf
+- Client side rendering
 - Developed by TDD
 - Rest API
 - Login && CRUD board functions
@@ -36,10 +36,10 @@
 - Junit5
 
 **Frontend**
-- Thymeleaf
 - Java script
 - Html
 - Css
+- React.js
 
 **Database**
 - H2
