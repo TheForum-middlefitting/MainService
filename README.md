@@ -17,9 +17,9 @@
 - Board Exception(2022/09/03)
 - Comment API(2022/09/05)
 - Comment Exception(2022/09/05)
-- Admin Rest API(2022/09/05~)
+- Client Rendering(2022/09/05~)
+- Admin Rest API
 - Admin Exception
-- Client Rendering
 - Admin Rendering
 - Spring Security
 - AOP
