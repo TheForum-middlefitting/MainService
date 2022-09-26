@@ -33,8 +33,6 @@
 - Spring boot
 - Spring security
 - Data JPA
-- JWT
-- Junit5
 
 **Frontend**
 - Java script
@@ -45,6 +43,12 @@
 **Database**
 - H2
 - Hibernate
+
+**Authentication**
+- JWT
+
+**Test**
+- Junit5
 
 **IDE**
 - IntelliJ
