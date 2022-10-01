@@ -18,7 +18,7 @@
 - Comment API(2022/09/05)
 - Comment Exception(2022/09/05)
 - Client Rendering(2022/09/05~)
-  - Javascript, React Studing... (2022/09/05 ~)
+  - Javascript, React Studing... (2022/09/05 ~ 9/28)
 - Admin Rest API
 - Admin Exception
 - Admin Rendering
@@ -35,7 +35,7 @@
 - Data JPA
 
 **Frontend**
-- Java script
+- Javascript
 - Html
 - Css
 - React.js

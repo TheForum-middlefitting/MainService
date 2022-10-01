@@ -6,6 +6,6 @@ public interface JwtProperties {
     static final String TOKEN_PREFIX = "MiddleFittingBearer ";
     static final String ACCESS_HEADER_STRING = "Authorization";
     static final String REFRESH_HEADER_STRING = "Refresh";
-    static final int ACCESS_EXPIRATION_TIME = 60000*60;
-    static final int REFRESH_EXPIRATION_TIME = 60000*60*24;
+    static final int ACCESS_EXPIRATION_TIME = 30 * 60 * 1000;
+    static final int REFRESH_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 }
