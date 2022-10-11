@@ -6,6 +6,7 @@ import HeaderForm from "./components/layout/header/HeaderForm";
 import AuthPage from "./pages/AuthPage";
 import {Navigate} from "react-router-dom";
 import axios from "axios";
+import SignUpPage from "./pages/SIgnUpPage";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
       </Routes>
     </main>
         {hello}

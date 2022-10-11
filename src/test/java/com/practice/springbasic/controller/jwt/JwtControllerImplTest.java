@@ -59,16 +59,16 @@ class JwtControllerImplTest {
                 .andExpect(jsonPath("$.status").value(200));
     }
 
-    @Test
-    public void updateAccessTokenFailedByNotExpired() throws Exception{
-        ResultActions resultActions = makeResultActions("/tokens/1", accessToken, refreshToken);
-        resultActions
-                .andExpect(status().isBadRequest())
-                .andExpect(header().doesNotExist("Authorization"))
-                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("토큰이 아직 만료되지 않았습니다!")))
-                .andExpect(jsonPath("$.status").value(400));
-    }
+//    @Test
+//    public void updateAccessTokenFailedByNotExpired() throws Exception{
+//        ResultActions resultActions = makeResultActions("/tokens/1", accessToken, refreshToken);
+//        resultActions
+//                .andExpect(status().isBadRequest())
+//                .andExpect(header().doesNotExist("Authorization"))
+//                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
+//                .andExpect(jsonPath("$.message", equalTo("토큰이 아직 만료되지 않았습니다!")))
+//                .andExpect(jsonPath("$.status").value(400));
+//    }
 
     @Test
     public void updateAccessTokenFailedByBothExpired() throws Exception{

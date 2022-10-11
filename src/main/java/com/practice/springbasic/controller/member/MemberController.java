@@ -1,7 +1,9 @@
 package com.practice.springbasic.controller.member;
 
+import com.practice.springbasic.controller.member.dto.EmailCheckForm;
 import com.practice.springbasic.controller.member.dto.LoginMemberForm;
 import com.practice.springbasic.controller.form.SuccessResult;
+import com.practice.springbasic.controller.member.dto.NicknameCheckForm;
 import com.practice.springbasic.domain.member.Member;
 import org.springframework.validation.BindingResult;
 
@@ -17,7 +19,7 @@ public interface MemberController {
 
     SuccessResult deleteMember(HttpServletRequest request, Long id, String password);
 
-    void duplicateEmailCheck(String email);
+    SuccessResult duplicateEmailCheckAPI(EmailCheckForm emailCheckForm, BindingResult bindingResult);
 
-    void duplicateNicknameCheck(String nickname);
+    SuccessResult duplicateNicknameCheckAPI(NicknameCheckForm nicknameCheckForm, BindingResult bindingResult);
 }

@@ -2,7 +2,6 @@ import classes from "./LoginForm.module.css"
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
-import authContext from "../../store/auth-context";
 import AuthContext from "../../store/auth-context";
 
 
@@ -14,11 +13,11 @@ export default function LoginForm() {
     const authCtx = useContext(AuthContext)
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if (isLogin) {
-    //         navigate(-1)
-    //     }
-    // }, [isLogin]);
+    useEffect(() => {
+        if (isLogin) {
+            navigate(-1)
+        }
+    }, [isLogin]);
 
 
     const submitHandler = (event: React.FormEvent): void => {
@@ -33,14 +32,7 @@ export default function LoginForm() {
             password: enteredPassword
         }).then(function (response) {
             if(response.status === 200){
-                const expirationTime = new Date(new Date().getTime() + 29 * 60 * 1000)
-                localStorage.setItem("expirationTime", expirationTime.toISOString())
-                localStorage.setItem("authorization", response?.headers?.authorization)
-                localStorage.setItem("refresh", response?.headers?.refresh)
-                localStorage.setItem("id", response?.data?.data?.id)
-                localStorage.setItem("nickname", response?.data?.data?.nickname)
-                localStorage.setItem("email", response?.data?.data?.email)
-                authCtx.login(response?.headers?.authorization, response?.headers?.refresh, expirationTime)
+                authCtx.login(response)
                 setIsLogin(true)
             } else {
                 alert(response.data.message);
@@ -48,10 +40,9 @@ export default function LoginForm() {
         }).catch(function (error) {
             alert(error.response.data.message);
         });
-
         setIsLoading(false)
     }
-    const switchAuthModeHandler = () => void {}
+
 
     return (
         <section className={classes.auth}>

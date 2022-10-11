@@ -1,5 +1,7 @@
 package com.practice.springbasic.controller.member;
 
+import com.practice.springbasic.controller.member.dto.EmailCheckForm;
+import com.practice.springbasic.controller.member.dto.NicknameCheckForm;
 import com.practice.springbasic.controller.utils.CheckUtil;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
@@ -50,28 +52,28 @@ public class MemberControllerUnitTest {
     public void duplicateNicknameCheckFailed() throws Exception{
         when(memberService.duplicateNickname(ArgumentMatchers.anyString())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateNicknameCheck(member.getNickname());});
+        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));});
     }
 
     @Test
     public void duplicateNicknameCheckSuccess() throws Exception{
         when(memberService.duplicateNickname(ArgumentMatchers.anyString())).thenReturn(false);
 
-        memberController.duplicateNicknameCheck(member.getNickname());
+        memberController.duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));
     }
 
     @Test
     public void duplicateEmailCheckFailed() throws Exception{
         when(memberService.duplicateEmail(ArgumentMatchers.anyString())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateEmailCheck(member.getNickname());});
+        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateEmailCheck(new EmailCheckForm(member.getNickname()));});
     }
 
     @Test
     public void duplicateEmailCheckSuccess() throws Exception{
         when(memberService.duplicateEmail(ArgumentMatchers.anyString())).thenReturn(false);
 
-        memberController.duplicateEmailCheck(member.getNickname());
+        memberController.duplicateEmailCheck(new EmailCheckForm(member.getNickname()));
     }
 
     @Test
