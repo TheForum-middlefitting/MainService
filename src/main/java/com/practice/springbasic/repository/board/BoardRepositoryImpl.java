@@ -41,7 +41,7 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom{
                 }
             }
         }
-        return new OrderSpecifier<>(Order.ASC, board.regDate);
+        return new OrderSpecifier<>(Order.DESC, board.regDate);
     }
     @Override
     public Page<BoardPageDto> findBoardPage(Pageable pageable, BoardPageSearchCondition condition) {
@@ -73,9 +73,9 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom{
                         boardWriterNicknameContains(condition.getBoardWriterNickname()),
                         boardTitleContains(condition.getBoardTitle()),
                         boardContentContains(condition.getBoardContent()),
-                        boardCategoryEq(condition.getBoardCategory()))
-                .offset(pageable.getPageNumber() * 10L)
-                .limit(100);
+                        boardCategoryEq(condition.getBoardCategory()));
+//                .offset(pageable.getPageNumber() * 10L)
+//                .limit(100);
         return PageableExecutionUtils.getPage(content, pageable, countQuery.fetch()::size);
     }
 

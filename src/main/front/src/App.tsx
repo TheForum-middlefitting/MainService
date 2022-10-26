@@ -7,30 +7,40 @@ import AuthPage from "./pages/AuthPage";
 import {Navigate} from "react-router-dom";
 import axios from "axios";
 import SignUpPage from "./pages/SIgnUpPage";
+import Board from "./pages/board/Board";
+import "bootstrap/dist/css/bootstrap.min.css";
+import {Container, ThemeProvider} from "react-bootstrap";
+import Study from "./components/Study";
+import BoardInfo from "./pages/board/board-info/BoardInfo";
+import NewBoard from "./pages/board/new-board/NewBoard";
+
 
 function App() {
-
-  const [hello, setHello] = useState('')
-
-  useEffect(() => {
-    axios.get('/boards/1')
-        .then(response => setHello(response?.data?.data?.content))
-        .catch(error => console.log(error))
-  }, []);
-
-
   return (
       <>
-        <header><HeaderForm/></header>
+        <ThemeProvider
+            breakpoints={['xxxl', 'xxl', 'xl', 'lg', 'md', 'sm', 'xs', 'xxs']}
+            minBreakpoint="xxs"
+        >
+            {/*<Container>*/}
+                <header><HeaderForm/></header>
+            {/*</Container>*/}
     <main>
-      <Routes>
-        <Route path="/" element={<Navigate to="/home" />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-      </Routes>
+        <Container className={"mx-auto my-3"}>
+            <Routes>
+                <Route path="/" element={<Navigate to="/home" />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/sign-up" element={<SignUpPage />} />
+                <Route path="/board/:category" element={<Board />}/>
+                <Route path="/board/board-info/:boardsId" element={<BoardInfo />}/>
+                <Route path="/board/new" element={<NewBoard />}/>
+                <Route path="/study" element={<Study/>}/>
+            </Routes>
+        </Container>
+
     </main>
-        {hello}
+        </ThemeProvider>
       </>
   );
 }

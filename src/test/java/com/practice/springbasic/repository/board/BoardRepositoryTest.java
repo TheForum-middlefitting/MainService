@@ -92,8 +92,8 @@ class BoardRepositoryTest {
         Page<BoardPageDto> result = boardRepository.findBoardPage(pageable, condition);
 
         assertThat(result).extracting("title")
-                .containsExactly(board1.getTitle(), board2.getTitle(), board3.getTitle(), board4.getTitle(), board5.getTitle(), board6.getTitle(),
-                        board7.getTitle(), board8.getTitle(), board9.getTitle(), board10.getTitle());
+                .containsExactly(board11.getTitle(), board10.getTitle(), board9.getTitle(), board8.getTitle(), board7.getTitle(), board6.getTitle(), board5.getTitle(),
+                        board4.getTitle(), board3.getTitle(), board2.getTitle());
         assertThat(result).extracting("memberId")
                 .contains(member1.getId(), member2.getId());
         assertThat(result.getTotalPages()).isEqualTo(2L);

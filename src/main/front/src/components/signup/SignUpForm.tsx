@@ -1,8 +1,9 @@
-import React, {useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import classes from "./SIgnUpForm.module.css";
 import {equal} from "assert";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import AuthContext from "../../store/auth-context";
 
 export default function SignUpForm(props: any) {
 
@@ -15,7 +16,15 @@ export default function SignUpForm(props: any) {
     const [nicknameDuplicateCheck, setNicknameDuplicateCheck] = useState(false)
     const [error, setError] = useState({title: "", message: ""});
     const navigate = useNavigate();
+    const authCtx = useContext(AuthContext);
+    const isLogin = authCtx.isLoggedIn;
 
+    //trim 처리 잘하자. 공백 있으면 가입 불가 만들자.
+    useEffect(() => {
+        if (isLogin) {
+            navigate(-1)
+        }
+    }, [isLogin]);
 
     const signUpRequest = (email: string, nickname: string, password: string) => {
         let url;
@@ -84,7 +93,7 @@ export default function SignUpForm(props: any) {
             });
             return;
         }
-        signUpRequest(enteredEmail, enteredNickname, enteredPassword);
+        signUpRequest(enteredEmail.trim(), enteredNickname.trim(), enteredPassword.trim());
     };
 
     const emailChangeHandler = (event: React.FormEvent<HTMLInputElement>) => {

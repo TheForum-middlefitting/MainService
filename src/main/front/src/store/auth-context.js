@@ -59,7 +59,7 @@ export const AuthContextProvider = (props) => {
     const loginHandler = (response) => {
         setAuthorizationToken(response?.headers?.authorization);
         setRefreshToken(response?.headers?.refresh)
-        const expirationTime = new Date(new Date().getTime() + 29 * 60 )
+        const expirationTime = new Date(new Date().getTime() + 29 * 60 * 1000)
         //문자열이어야 한다는 것에 유념한다.
         localStorage.setItem("expirationTime", expirationTime.toISOString())
         localStorage.setItem("authorization", response?.headers?.authorization)
@@ -81,7 +81,7 @@ export const AuthContextProvider = (props) => {
             }
         }).then(function (response) {
             if (response.status === 200) {
-                const expirationTime = new Date(new Date().getTime() + 29 * 60)
+                const expirationTime = new Date(new Date().getTime() + 29 * 60 * 1000)
                 localStorage.setItem("expirationTime", expirationTime.toISOString())
                 localStorage.setItem("authorization", response?.headers?.authorization)
                 setAuthorizationToken(response?.headers?.authorization)

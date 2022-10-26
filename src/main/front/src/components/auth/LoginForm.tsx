@@ -6,7 +6,6 @@ import AuthContext from "../../store/auth-context";
 
 
 export default function LoginForm() {
-    const [isLogin, setIsLogin] = useState<boolean>(!!localStorage.getItem('authorization'));
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const emailInputRef = useRef<HTMLInputElement>(null)
     const passwordInputRef = useRef<HTMLInputElement>(null)
@@ -14,10 +13,10 @@ export default function LoginForm() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (isLogin) {
+        if (authCtx.isLoggedIn) {
             navigate(-1)
         }
-    }, [isLogin]);
+    }, [authCtx, navigate]);
 
 
     const submitHandler = (event: React.FormEvent): void => {
@@ -33,7 +32,6 @@ export default function LoginForm() {
         }).then(function (response) {
             if(response.status === 200){
                 authCtx.login(response)
-                setIsLogin(true)
             } else {
                 alert(response.data.message);
             }
@@ -46,7 +44,7 @@ export default function LoginForm() {
 
     return (
         <section className={classes.auth}>
-            <h1>{isLogin ? "Login" : "Sign Up"}</h1>
+            <h1>{authCtx.isLoggedIn ? "Login" : "Sign Up"}</h1>
             <form onSubmit={submitHandler}>
                 <div className={classes.control}>
                     <label htmlFor="email">Your Email</label>
@@ -71,7 +69,7 @@ export default function LoginForm() {
                 </div>
             </form>
             <p/>
-            {!isLoading && <Link to={`/signup`}>Create new account</Link>}
+            {!isLoading && <Link to={`/sign-up`}>Create new account</Link>}
         </section>
 
     )

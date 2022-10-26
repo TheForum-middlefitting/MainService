@@ -86,6 +86,7 @@ public class BoardControllerImpl implements BoardController{
     @Override
     @PostMapping("boards/offset/")
     public SuccessResult searchBoardPage(@PageableDefault(page = 0, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable, @RequestBody @Validated BoardPageSearchCondition condition, BindingResult bindingResult) {
+//        System.out.println(pageable.getSort());
         CheckUtil.bindingResultCheck(bindingResult.hasErrors());
         Page<BoardPageDto> boardPage = boardService.findBoardPage(pageable, condition);
         return new SuccessResult(boardPage);
