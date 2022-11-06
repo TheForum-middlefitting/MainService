@@ -1,6 +1,8 @@
 package com.practice.springbasic.domain.member;
 
 import com.practice.springbasic.domain.base.BaseEntity;
+import com.practice.springbasic.domain.board.Board;
+import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.member.dto.MemberDto;
 import com.sun.istack.NotNull;
 import lombok.*;
@@ -9,6 +11,8 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,6 +28,12 @@ public class Member extends BaseEntity {
     private String  email;
     @NotNull @NotEmpty @Length(min=10, max=20)
     private String  password;
+
+    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    private final List<Board> board = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", orphanRemoval = true)
+    private final List<Comment> comment = new ArrayList<>();
 
     @Builder
     public Member(String nickname, String email, String password) throws IllegalStateException{

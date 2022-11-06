@@ -14,6 +14,7 @@ public interface MemberController {
     SuccessResult joinMember(HttpServletResponse response, Member member, BindingResult bindingResult);
 
     SuccessResult loginMember(HttpServletResponse response, LoginMemberForm loginMemberForm, BindingResult bindingResult);
+    SuccessResult getMember(HttpServletRequest request, Long id);
 
     SuccessResult updateMember(HttpServletRequest request, Long id, Member member, BindingResult bindingResult);
 

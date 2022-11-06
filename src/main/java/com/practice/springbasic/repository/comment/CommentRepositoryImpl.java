@@ -63,8 +63,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .where(
                         ltCommentId(condition.getCommentId()),
                         comment.board.id.eq(boardId)
-                )
-                .limit(10);
+                );
         return PageableExecutionUtils.getPage(content, pageable, countQuery.fetch()::size);
     }
 

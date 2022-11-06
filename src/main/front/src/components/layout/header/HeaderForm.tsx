@@ -1,9 +1,11 @@
 import classes from "./Header.module.css";
-import {Link, useNavigate} from "react-router-dom";
-import AuthContext from "../../../store/auth-context";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import AuthContext from "../../../store/context/auth-context";
 import {useContext, useEffect, useState} from "react";
+import {Dropdown} from "react-bootstrap";
 
 export default function HeaderForm() {
+    const location = useLocation();
     const authCtx = useContext(AuthContext);
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState<boolean>(!!localStorage.getItem('authorization'));
@@ -13,7 +15,11 @@ export default function HeaderForm() {
     }, [authCtx.isLoggedIn])
 
     const toLoginPage = () => {
-        navigate('/auth');
+        navigate('/auth', {
+            state: {
+                returnUrl: location.pathname
+            }
+        });
     }
 
     const toSignUpPage = () => {
@@ -29,7 +35,7 @@ export default function HeaderForm() {
     }
 
     const toBoardPage = () => {
-        navigate("/board/total")
+        navigate("/board")
     }
 
     const toStudyPage = () => {
@@ -41,9 +47,24 @@ export default function HeaderForm() {
     }
 
     const loginForm = <button type="button" className="btn btn-outline-light me-2" onClick={toLoginPage}>Login</button>;
-    const logoutForm = <button type="button" className="btn btn-outline-light me-2" onClick={authCtx.logout}>Logout</button>;
+    const logoutForm = <button type="button" className="btn btn-outline-light me-2"
+                               onClick={authCtx.logout}>Logout</button>;
     const signUpForm = <button type="button" className="btn btn-warning" onClick={toSignUpPage}>Sign-up</button>;
     const myPageForm = <button type="button" className="btn btn-warning" onClick={toMyPage}>My-page</button>
+    // const myPageForm =
+    //     (
+    //         <Dropdown>
+    //             <Dropdown.Toggle variant="success" id="dropdown-basic">
+    //                 My-page
+    //             </Dropdown.Toggle>
+    //
+    //             <Dropdown.Menu>
+    //                 <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+    //                 <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+    //                 <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+    //             </Dropdown.Menu>
+    //         </Dropdown>
+    //     )
 
     return (
         <>
@@ -58,10 +79,14 @@ export default function HeaderForm() {
                         </a>
 
                         <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                            <li><a role={"button"} className="nav-link px-2 text-secondary" onClick={toHomePage}>Home</a></li>
-                            <li><a role={"button"} className="nav-link px-2 text-white" onClick={toBoardPage}>Board</a></li>
-                            <li><a role={"button"} className="nav-link px-2 text-white" onClick={toStudyPage}>Study</a></li>
-                            <li><a role={"button"} className="nav-link px-2 text-white" onClick={toChatBotPage}>Chat-bot</a></li>
+                            <li><a role={"button"} className="nav-link px-2 text-secondary"
+                                   onClick={toHomePage}>Home</a></li>
+                            <li><a role={"button"} className="nav-link px-2 text-white" onClick={toBoardPage}>Board</a>
+                            </li>
+                            <li><a role={"button"} className="nav-link px-2 text-white" onClick={toStudyPage}>Study</a>
+                            </li>
+                            <li><a role={"button"} className="nav-link px-2 text-white"
+                                   onClick={toChatBotPage}>Chat-bot</a></li>
                             <li><a role={"button"} className="nav-link px-2 text-white">FAQs</a></li>
                             {/*<li><a href="#" className="nav-link px-2 text-white">About</a></li>*/}
                         </ul>
@@ -73,7 +98,7 @@ export default function HeaderForm() {
                         </form>
                         <div className="text-end">
                             {isLogin ? logoutForm : loginForm}
-                            {isLogin? myPageForm : signUpForm}
+                            {isLogin ? myPageForm : signUpForm}
                         </div>
                     </div>
                 </div>

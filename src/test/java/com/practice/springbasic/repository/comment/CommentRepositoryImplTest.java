@@ -68,8 +68,8 @@ class CommentRepositoryImplTest {
                         "comment is this7",
                         "comment is this6",
                         "comment is this5");
-        assertThat(result.getTotalPages()).isEqualTo(1L);
-        assertThat(result.getTotalElements()).isEqualTo(10L);
+        assertThat(result.getTotalPages()).isEqualTo(2L);
+        assertThat(result.getTotalElements()).isEqualTo(15L);
 
         Pageable pageable2 = PageRequest.of(0, 10);
         CommentPageSearchCondition condition2 = new CommentPageSearchCondition(6L);

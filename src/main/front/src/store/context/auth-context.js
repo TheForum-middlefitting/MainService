@@ -7,6 +7,8 @@ const AuthContext = React.createContext({
     authorization: "",
     refresh: "",
     isLoggedIn: false,
+    id: 0,
+
     login: (response) => {
     },
     logout: () => {
@@ -24,10 +26,12 @@ const retrieveStoredToken = () => {
     const storedRefreshToken = localStorage.getItem("refresh");
     const sortedExpirationDate = localStorage.getItem("expirationTime");
     const remainingTime = calculateRemainingTime(sortedExpirationDate);
+    const memberId = localStorage.getItem("id");
     return {
         authorization: storedAuthorizationToken,
         refresh: storedRefreshToken,
         duration: remainingTime,
+        memberId: memberId,
     };
 };
 
@@ -35,16 +39,21 @@ export const AuthContextProvider = (props) => {
     const tokenData = retrieveStoredToken();
     let authorization;
     let refresh;
+    let memberId;
     if (tokenData) {
         authorization = tokenData.authorization;
         refresh = tokenData.refresh
+        memberId = tokenData.memberId
     }
     const [authorizationToken, setAuthorizationToken] = useState(authorization);
     const [refreshToken, setRefreshToken] = useState(refresh);
+    const [id, setId] = useState(memberId);
     const userIsLogin = !!authorizationToken;
 
     const logoutHandler = useCallback(() => {
         setAuthorizationToken(null);
+        setRefreshToken(null);
+        setId(null);
         localStorage.removeItem("authorization");
         localStorage.removeItem("refresh");
         localStorage.removeItem("expirationTime")
@@ -59,6 +68,7 @@ export const AuthContextProvider = (props) => {
     const loginHandler = (response) => {
         setAuthorizationToken(response?.headers?.authorization);
         setRefreshToken(response?.headers?.refresh)
+        setId(response?.data?.data?.id)
         const expirationTime = new Date(new Date().getTime() + 29 * 60 * 1000)
         //문자열이어야 한다는 것에 유념한다.
         localStorage.setItem("expirationTime", expirationTime.toISOString())
@@ -73,7 +83,7 @@ export const AuthContextProvider = (props) => {
     const extendAuthorizationToken = useCallback(() => {
         const id = localStorage.getItem("id");
         const url = `/tokens/${id}`;
-
+        if (!id) {return}
         axios.get(url, {
             headers: {
                 authorization: authorizationToken,
@@ -100,7 +110,6 @@ export const AuthContextProvider = (props) => {
     useEffect(() => {
         if (tokenData) {
             logoutTimer = setTimeout(extendAuthorizationToken, tokenData.duration);
-            console.log(tokenData.duration)
         }
     }, [tokenData, extendAuthorizationToken]);
 
@@ -110,6 +119,8 @@ export const AuthContextProvider = (props) => {
         isLoggedIn: userIsLogin,
         login: loginHandler,
         logout: logoutHandler,
+        // id: memberId,
+        id: id,
     };
 
     return (

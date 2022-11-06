@@ -2,6 +2,7 @@ package com.practice.springbasic.domain.board;
 
 import com.practice.springbasic.domain.base.BaseConstructorEntity;
 import com.practice.springbasic.domain.base.BaseEntity;
+import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.sun.istack.NotNull;
@@ -10,6 +11,8 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,6 +28,9 @@ public class Board extends BaseConstructorEntity {
     private String title;
     @NotNull @NotEmpty @Size( min = 10, max = 1000)
     private String content;
+
+    @OneToMany(mappedBy = "board", orphanRemoval = true)
+    private final List<Comment> comment = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

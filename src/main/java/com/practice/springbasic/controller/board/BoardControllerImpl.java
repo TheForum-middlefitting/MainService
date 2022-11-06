@@ -40,9 +40,7 @@ public class BoardControllerImpl implements BoardController{
         Long memberId = JwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
         Member member = memberService.findMemberById(memberId).orElse(null);
         CheckUtil.nullCheck(member);
-
         Board board = boardService.postBoard(member, boardDto);
-
         return new SuccessResult(new ReturnSingleBoardForm(board));
     }
 

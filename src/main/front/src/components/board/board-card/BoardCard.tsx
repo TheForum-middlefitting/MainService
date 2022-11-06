@@ -1,7 +1,7 @@
 import Card from "react-bootstrap/Card";
 import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
-import AuthContext from "../../../store/auth-context";
+import AuthContext from "../../../store/context/auth-context";
 import {useNavigate} from "react-router-dom";
 
 
@@ -25,6 +25,7 @@ export default function BoardCard(props: any) {
     }
 
     let directionHandler = (eventkey: any) => {
+        console.log(props.initialParams.direction)
         if (eventkey === props.initialParams.direction) {
             return
         }
@@ -70,6 +71,7 @@ export default function BoardCard(props: any) {
                 </Card.Title>
                 <div className="d-flex w-200 justify-content-between">
                     {authCtx.isLoggedIn ? <Button variant="primary" onClick={toNewBoard}>글 작성하기</Button> :  <Button variant="secondary" disabled={false} onClick={toNewBoard}>로그인 후 작성</Button>}
+                   <Button variant="primary" onClick={props.refreshHandler}>새로고침</Button>
                 </div>
             </Card.Body>
         </Card>

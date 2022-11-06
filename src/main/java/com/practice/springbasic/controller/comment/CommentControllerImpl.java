@@ -48,9 +48,7 @@ public class CommentControllerImpl implements CommentController{
         Board board = boardService.findBoard(boardId).orElse(null);
         CheckUtil.nullCheck(member);
         CheckUtil.nullCheck(board);
-
         Comment comment = commentService.postComment(member, board, commentDto);
-
         return new SuccessResult(new ReturnSingleCommentForm(comment));
     }
 

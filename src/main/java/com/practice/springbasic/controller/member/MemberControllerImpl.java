@@ -58,6 +58,16 @@ public class MemberControllerImpl implements MemberController{
     }
 
     @Override
+    @GetMapping("members/{id}")
+    public SuccessResult getMember(HttpServletRequest request, @PathVariable Long id) {
+        JwtUtils.verifyJwtToken(request, id, JwtProperties.ACCESS_HEADER_STRING);
+        Member member = memberService.findMemberById(id).orElse(null);
+        memberInfoNullCheck(member);
+        assert member != null;
+        return new SuccessResult(createMemberForm(member));
+    }
+
+    @Override
     @PutMapping("members/{id}")
     public SuccessResult updateMember(HttpServletRequest request, @PathVariable Long id, @RequestBody @Validated Member member, BindingResult bindingResult) {
         //이메일은 바뀌지 말아야 한다.
@@ -119,6 +129,10 @@ public class MemberControllerImpl implements MemberController{
 
     public void memberNullCheck(Object checkValue) {
         if(checkValue == null) {throw new IllegalArgumentException("이메일 혹은 패스워드가 잘못되었습니다!");}
+    }
+
+    public void memberInfoNullCheck(Object checkValue) {
+        if(checkValue == null) {throw new IllegalArgumentException("존재하지 않는 사용자입니다!");}
     }
 
     public MemberDto createMemberDto(Member member) {

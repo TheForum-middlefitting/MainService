@@ -12,6 +12,7 @@ public class ReturnSingleBoardForm {
     String content;
     String nickname;
     String email;
+    Long memberId;
 
     public ReturnSingleBoardForm(Board board) {
         this.boardId = board.getId();
@@ -20,5 +21,6 @@ public class ReturnSingleBoardForm {
         this.content = board.getContent();
         this.nickname = board.getMember().getNickname();
         this.email = board.getMember().getEmail();
+        this.memberId = board.getMember().getId();
     }
 }
