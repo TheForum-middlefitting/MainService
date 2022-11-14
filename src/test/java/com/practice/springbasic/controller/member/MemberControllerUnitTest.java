@@ -12,6 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -52,28 +55,28 @@ public class MemberControllerUnitTest {
     public void duplicateNicknameCheckFailed() throws Exception{
         when(memberService.duplicateNickname(ArgumentMatchers.anyString())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));});
+        assertThrows(IllegalArgumentException.class, () -> {memberController.nicknameDuplicateCheck(member.getNickname());});
     }
 
     @Test
     public void duplicateNicknameCheckSuccess() throws Exception{
         when(memberService.duplicateNickname(ArgumentMatchers.anyString())).thenReturn(false);
 
-        memberController.duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));
+        memberController.nicknameDuplicateCheck(member.getNickname());
     }
 
     @Test
     public void duplicateEmailCheckFailed() throws Exception{
         when(memberService.duplicateEmail(ArgumentMatchers.anyString())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> {memberController.duplicateEmailCheck(new EmailCheckForm(member.getNickname()));});
+        assertThrows(IllegalArgumentException.class, () -> {memberController.emailDuplicateCheck(member.getNickname());});
     }
 
     @Test
     public void duplicateEmailCheckSuccess() throws Exception{
         when(memberService.duplicateEmail(ArgumentMatchers.anyString())).thenReturn(false);
 
-        memberController.duplicateEmailCheck(new EmailCheckForm(member.getNickname()));
+        memberController.emailDuplicateCheck(member.getNickname());
     }
 
     @Test
@@ -95,4 +98,5 @@ public class MemberControllerUnitTest {
     public void memberNullCheckSuccess() throws Exception{
         memberController.memberNullCheck(member);
     }
+
 }

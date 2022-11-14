@@ -1,9 +1,11 @@
 import Badge from "react-bootstrap/Badge";
 import React from "react";
 import {useNavigate} from "react-router-dom";
+import {elapsedTime} from "../../utils/dateParse";
 
 export default function BoarListElement(props : any) {
     const navigate = useNavigate();
+    const elapsedDate = elapsedTime(props.regDate);
 
     const toSingleBoardsPage = () => {
         navigate(`/boards/info/${props.id}`,  {state : {
@@ -28,7 +30,7 @@ export default function BoarListElement(props : any) {
             <a style={{cursor: "pointer"}} onClick={toSingleBoardsPage} className="list-group-item list-group-item-light flex-column align-items-start">
                 <div className="d-flex w-100 justify-content-between">
                     <p className="mb-2"><small>{props.nickname}</small></p>
-                    <p><small className="text-muted">3 days ago</small></p>
+                    <p><small className="text-muted">{elapsedDate}</small></p>
                 </div>
                 <div className="d-flex w-100">
                     <h6 className="mb-2"><strong>{props.title}</strong></h6>

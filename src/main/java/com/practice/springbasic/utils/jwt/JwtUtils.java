@@ -1,9 +1,10 @@
-package com.practice.springbasic.config.jwt;
+package com.practice.springbasic.utils.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.practice.springbasic.config.jwt.JwtProperties;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;

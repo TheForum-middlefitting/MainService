@@ -1,7 +1,7 @@
 package com.practice.springbasic.controller.jwt;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.config.jwt.JwtUtils;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.form.SuccessResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

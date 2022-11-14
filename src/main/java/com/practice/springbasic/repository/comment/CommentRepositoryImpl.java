@@ -19,7 +19,7 @@ import java.util.List;
 
 import static com.practice.springbasic.domain.comment.QComment.comment;
 
-public class CommentRepositoryImpl implements CommentRepositoryCustom{
+public class CommentRepositoryImpl implements CommentRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     public CommentRepositoryImpl(EntityManager em) {
@@ -38,6 +38,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
 //        }
         return new OrderSpecifier<>(Order.DESC, comment.regDate);
     }
+
     @Override
     public Page<CommentPageDto> findCommentPage(Pageable pageable, CommentPageSearchCondition condition, Long boardId) {
         List<CommentPageDto> content = queryFactory
@@ -47,7 +48,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                                 comment.board.id,
                                 comment.member.id,
                                 comment.member.nickname,
-                                comment.member.email
+                                comment.member.email,
+                                comment.regDate
                         )
                 )
                 .from(comment)
@@ -68,6 +70,6 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
     }
 
     private BooleanExpression ltCommentId(Long commentId) {
-        return commentId == null ?  null : comment.id.lt(commentId);
+        return commentId == null ? null : comment.id.lt(commentId);
     }
 }

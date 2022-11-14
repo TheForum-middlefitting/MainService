@@ -51,7 +51,8 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom{
                         board.boardCategory,
                         board.title,
                         board.member.id,
-                        board.member.nickname
+                        board.member.nickname,
+                        board.regDate
                         )
                 )
                 .from(board)

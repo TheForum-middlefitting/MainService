@@ -64,6 +64,7 @@ export default function BoardForm(props: any) {
                     memberId: content[key].memberId,
                     nickname: content[key].nickname,
                     title: content[key].title,
+                    regDate: content[key].regDate,
                 })
             }
             setBoardsData(loadedBoards);
@@ -117,6 +118,7 @@ export default function BoardForm(props: any) {
             memberId={board.memberId}
             nickname={board.nickname}
             title={board.title}
+            regDate={board.regDate}
         />
     })
 

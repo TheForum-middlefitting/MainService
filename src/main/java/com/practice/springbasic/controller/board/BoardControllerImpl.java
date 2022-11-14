@@ -1,7 +1,7 @@
 package com.practice.springbasic.controller.board;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.config.jwt.JwtUtils;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.board.dto.ReturnSingleBoardForm;
 import com.practice.springbasic.controller.utils.CheckUtil;
 import com.practice.springbasic.controller.form.SuccessResult;

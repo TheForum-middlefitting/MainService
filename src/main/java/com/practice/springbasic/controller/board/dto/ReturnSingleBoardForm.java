@@ -4,6 +4,8 @@ import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class ReturnSingleBoardForm {
     Long boardId;
@@ -13,6 +15,7 @@ public class ReturnSingleBoardForm {
     String nickname;
     String email;
     Long memberId;
+    LocalDateTime regDate;
 
     public ReturnSingleBoardForm(Board board) {
         this.boardId = board.getId();
@@ -22,5 +25,6 @@ public class ReturnSingleBoardForm {
         this.nickname = board.getMember().getNickname();
         this.email = board.getMember().getEmail();
         this.memberId = board.getMember().getId();
+        this.regDate = board.getRegDate();
     }
 }

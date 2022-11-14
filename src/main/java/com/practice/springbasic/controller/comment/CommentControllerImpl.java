@@ -1,7 +1,7 @@
 package com.practice.springbasic.controller.comment;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.config.jwt.JwtUtils;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.comment.dto.ReturnSingleCommentForm;
 import com.practice.springbasic.controller.form.SuccessResult;
 import com.practice.springbasic.controller.utils.CheckUtil;
@@ -9,8 +9,6 @@ import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.repository.board.dto.BoardPageDto;
-import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.repository.comment.dto.CommentPageDto;
 import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;

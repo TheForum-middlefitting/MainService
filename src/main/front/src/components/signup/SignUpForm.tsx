@@ -9,7 +9,7 @@ import {alertActions} from "../../store/redux/alertSlice";
 import {warningActions} from "../../store/redux/warningSlice";
 import {useDispatch} from "react-redux";
 import {useMutation} from "react-query";
-import {emailCheckRequest, nicknameCheckRequest, signUpRequest} from "../../request/usersRequesr";
+import {emailCheckRequest, nicknameCheckRequest, signUpRequest} from "../../request/usersRequest";
 
 export default function SignUpForm(props: any) {
 

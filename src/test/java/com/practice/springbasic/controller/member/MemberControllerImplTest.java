@@ -36,7 +36,7 @@ class MemberControllerImplTest {
     MockMvc mockMvc;
     @MockBean
     MemberService memberService;
-    
+
     //편한데 오래된 방식이라 나온다 
     //LinkedMultiValueMap<String, String> 를 통해 추후 변경
     @Autowired
@@ -56,7 +56,7 @@ class MemberControllerImplTest {
     }
 
     @Test
-    public void joinMemberSuccess() throws Exception{
+    public void joinMemberSuccess() throws Exception {
         when(memberService.join(ArgumentMatchers.any(Member.class))).thenReturn(member);
         String content = objectMapper.writeValueAsString(member);
 
@@ -77,7 +77,7 @@ class MemberControllerImplTest {
     }
 
     @Test
-    public void joinMemberFailedByEmailParsingError() throws Exception{
+    public void joinMemberFailedByEmailParsingError() throws Exception {
         String content = objectMapper.writeValueAsString(FailedEmailParsingMember);
 
         ResultActions resultActions = makePostResultActions("/members", content);
@@ -87,13 +87,13 @@ class MemberControllerImplTest {
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
                 .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다!")))
+                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다")))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
 
     @Test
-    public void joinMemberFailedByNicknameParsingError() throws Exception{
+    public void joinMemberFailedByNicknameParsingError() throws Exception {
         String content = objectMapper.writeValueAsString(FailedNicknameParsingMember);
 
         ResultActions resultActions = makePostResultActions("/members", content);
@@ -103,13 +103,13 @@ class MemberControllerImplTest {
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
                 .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다!")))
+                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다")))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
 
     @Test
-    public void joinMemberFailedByPasswordParsingError() throws Exception{
+    public void joinMemberFailedByPasswordParsingError() throws Exception {
         String content = objectMapper.writeValueAsString(FailedPasswordParsingMember);
 
         ResultActions resultActions = makePostResultActions("/members", content);
@@ -119,13 +119,13 @@ class MemberControllerImplTest {
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
                 .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다!")))
+                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다")))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
 
     @Test
-    public void joinMemberFailedByDuplicateEmail() throws Exception{
+    public void joinMemberFailedByDuplicateEmail() throws Exception {
         when(memberService.duplicateEmail(ArgumentMatchers.anyString())).thenReturn(true);
         String content = objectMapper.writeValueAsString(member);
 
@@ -136,12 +136,12 @@ class MemberControllerImplTest {
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
                 .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("중복된 이메일입니다!")))
+                .andExpect(jsonPath("$.message", equalTo("중복된 이메일입니다")))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
-    public void joinMemberFailedByDuplicateNickname() throws Exception{
+    public void joinMemberFailedByDuplicateNickname() throws Exception {
         when(memberService.duplicateNickname(member.getNickname())).thenReturn(true);
         String content = objectMapper.writeValueAsString(member);
 
@@ -152,12 +152,12 @@ class MemberControllerImplTest {
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
                 .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("중복된 닉네임입니다!")))
+                .andExpect(jsonPath("$.message", equalTo("중복된 닉네임입니다")))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
-    public void loginMemberSuccess() throws Exception{
+    public void loginMemberSuccess() throws Exception {
         when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(member));
         LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
         String content = objectMapper.writeValueAsString(loginMemberForm);
@@ -175,7 +175,7 @@ class MemberControllerImplTest {
     }
 
     @Test
-    public void loginMemberFailed() throws Exception{
+    public void loginMemberFailed() throws Exception {
         when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(null));
         LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
         String content = objectMapper.writeValueAsString(loginMemberForm);
@@ -191,7 +191,7 @@ class MemberControllerImplTest {
     }
 
     @Test
-    public void updateMemberSuccess() throws Exception{
+    public void updateMemberSuccess() throws Exception {
         when(memberService.find(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(member));
         String content = objectMapper.writeValueAsString(member);
         String jwtToken = JWT.create()
@@ -212,10 +212,20 @@ class MemberControllerImplTest {
                 .andExpect(jsonPath("$.data.email").value(member.getEmail()));
     }
 
+    @Test
+    public void nicknameDuplicateFalse() throws Exception {
+        ResultActions resultActions = makeGetResultActions("/members/email-check?email=middle");
+
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
+                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다")))
+                .andExpect(jsonPath("$.status").value(400));
+    }
 
 
     @Test
-    public void deleteMemberSuccess() throws Exception{
+    public void deleteMemberSuccess() throws Exception {
         when(memberService.findMemberByIdAndPassword(1L, member.getPassword())).thenReturn(Optional.ofNullable(member));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
@@ -256,10 +266,11 @@ class MemberControllerImplTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
-    ResultActions makeGetResultActions(String url, String content, LinkedMultiValueMap queryParams) throws Exception {
+    //    ResultActions makeGetResultActions(String url, String content, LinkedMultiValueMap queryParams) throws Exception {
+    ResultActions makeGetResultActions(String url) throws Exception {
         return mockMvc.perform(get(url)
-                        .queryParams(queryParams)
-                        .content(content)
+//                        .queryParams(queryParams)
+//                        .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));

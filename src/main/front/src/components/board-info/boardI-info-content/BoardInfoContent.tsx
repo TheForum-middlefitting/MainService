@@ -8,6 +8,7 @@ import {deleteBoardsRequest, newBoardParams, updateBoardsRequest} from "../../..
 import {alertActions} from "../../../store/redux/alertSlice";
 import {errorActions} from "../../../store/redux/errorSlice";
 import {useNavigate} from "react-router-dom";
+import {elapsedTime, getDate, getDateTime} from "../../utils/dateParse";
 
 export default function BoardInfoContent(props: any) {
     const authCtx = useContext(AuthContext)
@@ -73,7 +74,7 @@ export default function BoardInfoContent(props: any) {
                     onClick={modalDeleteHandler}>삭제</Button>
         </div>
     )
-
+    const dateTimeString = getDateTime(props.boardsInfoData.regDate);
 
     return (
         <>
@@ -90,7 +91,7 @@ export default function BoardInfoContent(props: any) {
                     <a style={{cursor: "pointer", textDecoration: "none", color: "black"}}
                        className="me-2">{props.boardsInfoData.nickname}</a>
                     <div className="vr mx-2"/>
-                    <a style={{cursor: "pointer"}}>시간</a>
+                    <a style={{cursor: "pointer"}}>{dateTimeString}</a>
                 </div>
                 <div>
                     조회 :

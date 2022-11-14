@@ -1,10 +1,10 @@
 package com.practice.springbasic.controller.member;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.config.jwt.JwtUtils;
 import com.practice.springbasic.controller.member.dto.EmailCheckForm;
-import com.practice.springbasic.controller.member.dto.LoginMemberForm;
 import com.practice.springbasic.controller.member.dto.NicknameCheckForm;
+import com.practice.springbasic.utils.jwt.JwtUtils;
+import com.practice.springbasic.controller.member.dto.LoginMemberForm;
 import com.practice.springbasic.controller.member.dto.ReturnMemberForm;
 import com.practice.springbasic.controller.utils.CheckUtil;
 import com.practice.springbasic.controller.form.SuccessResult;
@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @RestController
+@Validated
 public class MemberControllerImpl implements MemberController{
 
     private final MemberService memberService;
@@ -29,10 +31,13 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PostMapping("/members")
-    public SuccessResult joinMember(HttpServletResponse response, @RequestBody @Validated Member member, BindingResult bindingResult) {
+    public SuccessResult joinMember(HttpServletResponse response, @RequestBody Member member, BindingResult bindingResult) {
         CheckUtil.bindingResultCheck(bindingResult.hasErrors());
-        duplicateEmailCheck(new EmailCheckForm(member.getEmail()));
-        duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));
+        System.out.println("error!!!");
+        emailDuplicateCheck(member.getEmail());
+        nicknameDuplicateCheck(member.getNickname());
+//        duplicateEmailCheck(new EmailCheckForm(member.getEmail()));
+//        duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));
         memberService.join(member);
 
         String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
@@ -73,7 +78,8 @@ public class MemberControllerImpl implements MemberController{
         //이메일은 바뀌지 말아야 한다.
         CheckUtil.bindingResultCheck(bindingResult.hasErrors());
         JwtUtils.verifyJwtToken(request, id, JwtProperties.ACCESS_HEADER_STRING);
-        duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));
+//        duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));
+        nicknameDuplicateCheck(member.getNickname());
 
         Member preMember = memberService.find(member.getEmail(), member.getPassword()).orElse(null);
         memberNullCheck(preMember);
@@ -93,39 +99,59 @@ public class MemberControllerImpl implements MemberController{
         return new SuccessResult(null);
     }
 
-    @Override
-    @PostMapping("/members/email-check")
-    public SuccessResult duplicateEmailCheckAPI(@RequestBody @Validated EmailCheckForm emailCheckForm, BindingResult bindingResult) {
-        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
-        if (memberService.duplicateEmail(emailCheckForm.getEmail())){
-            throw new IllegalArgumentException("중복된 이메일입니다!");
-        }
-        return new SuccessResult(null);
-    }
+//    @Override
+//    @PostMapping("/members/email-check")
+//    public SuccessResult duplicateEmailCheckAPI(@RequestBody @Validated EmailCheckForm emailCheckForm, BindingResult bindingResult) {
+//        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
+//        if (memberService.duplicateEmail(emailCheckForm.getEmail())){
+//            throw new IllegalArgumentException("중복된 이메일입니다!");
+//        }
+//        return new SuccessResult(null);
+//    }
+//
+//    @Override
+//    @PostMapping("/members/nickname-check")
+//    public SuccessResult duplicateNicknameCheckAPI(@RequestBody @Validated NicknameCheckForm nicknameCheckForm, BindingResult bindingResult) {
+//        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
+//        if(memberService.duplicateNickname(nicknameCheckForm.getNickname())) {
+//            throw new IllegalArgumentException("중복된 닉네임입니다!");
+//        }
+//        return new SuccessResult(null);
+//    }
 
     @Override
-    @PostMapping("/members/nickname-check")
-    public SuccessResult duplicateNicknameCheckAPI(@RequestBody @Validated NicknameCheckForm nicknameCheckForm, BindingResult bindingResult) {
-        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
-        if(memberService.duplicateNickname(nicknameCheckForm.getNickname())) {
-            throw new IllegalArgumentException("중복된 닉네임입니다!");
+    @GetMapping("/members/nickname-check")
+    public SuccessResult nicknameDuplicateCheck(
+            @RequestParam("nickname") String nickname) {
+        if(memberService.duplicateNickname(nickname)) {
+            throw new IllegalArgumentException("중복된 닉네임입니다");
         }
         return new SuccessResult(null);
     }
 
-    public SuccessResult duplicateEmailCheck(@RequestBody @Validated EmailCheckForm emailCheckForm) {
-        if (memberService.duplicateEmail(emailCheckForm.getEmail())){
-            throw new IllegalArgumentException("중복된 이메일입니다!");
+    @Override
+    @GetMapping("/members/email-check")
+    public SuccessResult emailDuplicateCheck(
+            @RequestParam("email") String email) {
+        if(memberService.duplicateEmail(email)) {
+            throw new IllegalArgumentException("중복된 이메일입니다");
         }
         return new SuccessResult(null);
     }
 
-    public SuccessResult duplicateNicknameCheck(@RequestBody @Validated NicknameCheckForm nicknameCheckForm) {
-        if(memberService.duplicateNickname(nicknameCheckForm.getNickname())) {
-            throw new IllegalArgumentException("중복된 닉네임입니다!");
-        }
-        return new SuccessResult(null);
-    }
+//    public SuccessResult duplicateEmailCheck(@RequestBody @Validated EmailCheckForm emailCheckForm) {
+//        if (memberService.duplicateEmail(emailCheckForm.getEmail())){
+//            throw new IllegalArgumentException("중복된 이메일입니다!");
+//        }
+//        return new SuccessResult(null);
+//    }
+//
+//    public SuccessResult duplicateNicknameCheck(@RequestBody @Validated NicknameCheckForm nicknameCheckForm) {
+//        if(memberService.duplicateNickname(nicknameCheckForm.getNickname())) {
+//            throw new IllegalArgumentException("중복된 닉네임입니다!");
+//        }
+//        return new SuccessResult(null);
+//    }
 
     public void memberNullCheck(Object checkValue) {
         if(checkValue == null) {throw new IllegalArgumentException("이메일 혹은 패스워드가 잘못되었습니다!");}

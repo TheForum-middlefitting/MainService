@@ -51,6 +51,7 @@ export default function CommentsList(props: any) {
                     memberId: content[key].memberId,
                     nickname: content[key].nickname,
                     content: content[key].content,
+                    regDate: content[key].regDate,
                 })
             }
             setCommentsCount(!commentsId ? responseData.totalElements : commentsCount)
@@ -73,6 +74,7 @@ export default function CommentsList(props: any) {
                 nickname={comment.nickname}
                 content={comment.content}
                 boardsId={props.boardsId}
+                regDate={comment.regDate}
                 setRefresh={setRefresh}
                 refresh={refresh}
                 setCommentsData={setCommentsData}

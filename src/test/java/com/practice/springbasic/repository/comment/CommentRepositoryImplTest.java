@@ -6,9 +6,7 @@ import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.repository.comment.dto.CommentPageDto;
 import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
@@ -19,37 +17,50 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @Transactional
 @EnableJpaAuditing
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CommentRepositoryImplTest {
-    @PersistenceContext
-    EntityManager em;
+//    @PersistenceContext
+//    EntityManager em;
+
+    @PersistenceUnit
+    private EntityManagerFactory factory;
 
     @Autowired
     CommentRepository commentRepository;
 
-    @BeforeEach
+    @BeforeAll
     public void createComment() throws Exception{
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
         for(int i=0; i< 5; i++) {
             Member member = new Member("member" + Integer.toString(i), "member" + Integer.toString(i) + "@gmail.com", "@memberPassword" + Integer.toString(i));
             em.persist(member);
+            em.flush();
             Board board = new Board(BoardCategory.free, "board" + Integer.toString(i) + "@gmail.com", "board content" + Integer.toString(i), member);
             em.persist(board);
+            em.flush();
             for (int j=0; j<15; j++) {
                 Comment comment = new Comment("comment is this" + Integer.toString(i * 15 + j), member, board);
                 em.persist(comment);
             }
+            System.out.println("here!!!");
             em.flush();
         }
+        em.getTransaction().commit();
+        em.close();
     }
 
     @Test
-    @Rollback(false)
+//    @Rollback(false)
     @DisplayName("searchCommentPageSuccess")
     void searchCommentPageSuccess() throws Exception{
         Pageable pageable = PageRequest.of(0, 10);
@@ -87,7 +98,7 @@ class CommentRepositoryImplTest {
     }
 
     @Test
-    @Rollback(false)
+//    @Rollback(false)
     @DisplayName("searchCommentPageSuccessByBeforeCommentId")
     void searchCommentPageSuccessByBeforeCommentId() throws Exception{
         Pageable pageable = PageRequest.of(0, 10);

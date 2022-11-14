@@ -11,6 +11,7 @@ import {useMutation, useQueryClient} from "react-query";
 import {newBoardParams, newBoardRequest} from "../../../../request/boardsRequest";
 import {alertActions} from "../../../../store/redux/alertSlice";
 import {errorActions} from "../../../../store/redux/errorSlice";
+import {elapsedTime} from "../../../utils/dateParse";
 
 export default function CommentsListElement(props: any) {
     const authCtx = useContext(AuthContext);
@@ -19,6 +20,8 @@ export default function CommentsListElement(props: any) {
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const queryClient = useQueryClient();
+    const elapsedDate = elapsedTime(props.regDate);
+
 
     const updateCommentsMutation = useMutation((params: commentsUpdateParams) => commentsUpdateRequest(params, authCtx.authorization), {
         onSuccess: () => {
@@ -159,7 +162,7 @@ export default function CommentsListElement(props: any) {
         <div className="list-group-item align-items-start">
             <div className="d-flex w-100 justify-content-between">
                 <h6 className="mb-3"><strong>{props.nickname}</strong></h6>
-                <p><small>7일전</small></p>
+                <p><small>{elapsedDate}</small></p>
             </div>
             <div className="d-flex w-100 justify-content-between">
                 <p>{content}</p>
@@ -173,7 +176,7 @@ export default function CommentsListElement(props: any) {
         <div className="list-group-item align-items-start">
             <div className="d-flex w-100 justify-content-between">
                 <h6 className="mb-3"><strong>{props.nickname}</strong></h6>
-                <p><small>7일전</small></p>
+                <p><small>{elapsedDate}</small></p>
             </div>
             <div>
                 <Form role={"submit"}>

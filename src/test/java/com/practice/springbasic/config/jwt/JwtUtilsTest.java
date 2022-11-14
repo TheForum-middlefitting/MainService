@@ -5,11 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-import static com.auth0.jwt.JWT.decode;
-import static com.practice.springbasic.config.jwt.JwtUtils.*;
+import static com.practice.springbasic.utils.jwt.JwtUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 

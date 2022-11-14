@@ -6,7 +6,7 @@ import AuthContext from "../../store/context/auth-context";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import {loginRequest} from "../../request/usersRequesr";
+import {loginRequest} from "../../request/usersRequest";
 import {useMutation} from "react-query";
 import {errorActions} from "../../store/redux/errorSlice";
 import {alertActions} from "../../store/redux/alertSlice";

@@ -1,9 +1,9 @@
-import UserInfo from "./user-info/UserInfo";
+import UsersInfo from "./users-info/UsersInfo";
 import {useQuery} from "react-query";
 import AuthContext from "../../store/context/auth-context";
 import {useContext, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {usersInfoRequest} from "../../request/usersRequesr";
+import {usersInfoRequest} from "../../request/usersRequest";
 
 export default function MyPageForm(){
     const authCtx = useContext(AuthContext);
@@ -11,7 +11,7 @@ export default function MyPageForm(){
 
     return (
         <>
-            {<UserInfo data={data}/>}
+            {<UsersInfo data={data}/>}
         </>
     )
 }
