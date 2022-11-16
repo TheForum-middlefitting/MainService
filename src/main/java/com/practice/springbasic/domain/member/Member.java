@@ -3,7 +3,7 @@ package com.practice.springbasic.domain.member;
 import com.practice.springbasic.domain.base.BaseEntity;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.comment.Comment;
-import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.service.member.dto.MemberDto;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
@@ -22,6 +22,8 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
+//    @Column(nullable = false, unique = true)
+//    private String userId;
     @NotNull @NotEmpty @Length(min=4, max=20)
     @Column(unique = true)
     private String  nickname;
@@ -47,10 +49,10 @@ public class Member extends BaseEntity {
         this.password = password;
     }
 
-    public void memberUpdate(MemberDto memberUpdateDto) {
-        this.nickname = memberUpdateDto.getNickname();
-        this.email = memberUpdateDto.getEmail();
-        this.password = memberUpdateDto.getPassword();
+    public void memberUpdate(MemberDto memberDto) {
+        this.nickname = memberDto.getNickname();
+        this.email = memberDto.getEmail();
+        this.password = memberDto.getPassword();
     }
 
 }

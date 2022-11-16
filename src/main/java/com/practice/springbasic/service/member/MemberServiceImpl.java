@@ -1,9 +1,12 @@
 package com.practice.springbasic.service.member;
 
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.service.member.dto.MemberDto;
 import com.practice.springbasic.repository.member.MemberJpaRepository;
-import com.practice.springbasic.service.member.MemberService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
+import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,13 +17,17 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberJpaRepository memberRepository;
+    private final ModelMapper modelMapper;
 
-    public MemberServiceImpl(MemberJpaRepository memberRepository) {
+    @Autowired
+    public MemberServiceImpl(MemberJpaRepository memberRepository, ModelMapper modelMapper) {
         this.memberRepository = memberRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public Member join(Member member) {
+    public Member join(MemberDto memberDto) {
+        Member member = modelMapper.map(memberDto, Member.class);
         memberRepository.save(member);
         return member;
     }

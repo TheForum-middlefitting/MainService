@@ -8,7 +8,7 @@ import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.service.member.dto.MemberDto;
 import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.board.dto.BoardDto;

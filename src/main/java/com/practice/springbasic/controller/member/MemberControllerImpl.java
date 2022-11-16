@@ -1,50 +1,55 @@
 package com.practice.springbasic.controller.member;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.controller.member.dto.EmailCheckForm;
-import com.practice.springbasic.controller.member.dto.NicknameCheckForm;
+import com.practice.springbasic.controller.form.SuccessCreatedResult;
+import com.practice.springbasic.controller.member.vo.RequestMemberForm;
+import com.practice.springbasic.controller.member.vo.ResponseMemberForm;
+import com.practice.springbasic.service.member.dto.MemberDto;
 import com.practice.springbasic.utils.jwt.JwtUtils;
-import com.practice.springbasic.controller.member.dto.LoginMemberForm;
-import com.practice.springbasic.controller.member.dto.ReturnMemberForm;
+import com.practice.springbasic.controller.member.vo.LoginMemberForm;
 import com.practice.springbasic.controller.utils.CheckUtil;
 import com.practice.springbasic.controller.form.SuccessResult;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.domain.member.dto.MemberDto;
 import com.practice.springbasic.service.member.MemberService;
+import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 @RestController
 @Validated
 public class MemberControllerImpl implements MemberController{
 
     private final MemberService memberService;
+    private final ModelMapper modelMapper;
 
-    public MemberControllerImpl(MemberService memberService) {
+    public MemberControllerImpl(MemberService memberService, ModelMapper modelMapper) {
         this.memberService = memberService;
+        this.modelMapper = modelMapper;
     }
 
     @Override
     @PostMapping("/members")
-    public SuccessResult joinMember(HttpServletResponse response, @RequestBody Member member, BindingResult bindingResult) {
+    public ResponseEntity<SuccessCreatedResult> joinMember(HttpServletResponse response, @RequestBody RequestMemberForm requestUserForm, BindingResult bindingResult) {
         CheckUtil.bindingResultCheck(bindingResult.hasErrors());
-        System.out.println("error!!!");
-        emailDuplicateCheck(member.getEmail());
-        nicknameDuplicateCheck(member.getNickname());
-//        duplicateEmailCheck(new EmailCheckForm(member.getEmail()));
-//        duplicateNicknameCheck(new NicknameCheckForm(member.getNickname()));
-        memberService.join(member);
+        emailDuplicateCheck(requestUserForm.getEmail());
+        nicknameDuplicateCheck(requestUserForm.getNickname());
+        MemberDto memberDto = modelMapper.map(requestUserForm, MemberDto.class);
+
+        Member member = memberService.join(memberDto);
 
         String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
         String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
         response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
         response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
-        return new SuccessResult(createMemberForm(member));
+        ResponseMemberForm responseMemberForm = createMemberForm(member);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessCreatedResult(responseMemberForm));
     }
 
     @Override
@@ -99,26 +104,6 @@ public class MemberControllerImpl implements MemberController{
         return new SuccessResult(null);
     }
 
-//    @Override
-//    @PostMapping("/members/email-check")
-//    public SuccessResult duplicateEmailCheckAPI(@RequestBody @Validated EmailCheckForm emailCheckForm, BindingResult bindingResult) {
-//        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
-//        if (memberService.duplicateEmail(emailCheckForm.getEmail())){
-//            throw new IllegalArgumentException("중복된 이메일입니다!");
-//        }
-//        return new SuccessResult(null);
-//    }
-//
-//    @Override
-//    @PostMapping("/members/nickname-check")
-//    public SuccessResult duplicateNicknameCheckAPI(@RequestBody @Validated NicknameCheckForm nicknameCheckForm, BindingResult bindingResult) {
-//        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
-//        if(memberService.duplicateNickname(nicknameCheckForm.getNickname())) {
-//            throw new IllegalArgumentException("중복된 닉네임입니다!");
-//        }
-//        return new SuccessResult(null);
-//    }
-
     @Override
     @GetMapping("/members/nickname-check")
     public SuccessResult nicknameDuplicateCheck(
@@ -139,20 +124,6 @@ public class MemberControllerImpl implements MemberController{
         return new SuccessResult(null);
     }
 
-//    public SuccessResult duplicateEmailCheck(@RequestBody @Validated EmailCheckForm emailCheckForm) {
-//        if (memberService.duplicateEmail(emailCheckForm.getEmail())){
-//            throw new IllegalArgumentException("중복된 이메일입니다!");
-//        }
-//        return new SuccessResult(null);
-//    }
-//
-//    public SuccessResult duplicateNicknameCheck(@RequestBody @Validated NicknameCheckForm nicknameCheckForm) {
-//        if(memberService.duplicateNickname(nicknameCheckForm.getNickname())) {
-//            throw new IllegalArgumentException("중복된 닉네임입니다!");
-//        }
-//        return new SuccessResult(null);
-//    }
-
     public void memberNullCheck(Object checkValue) {
         if(checkValue == null) {throw new IllegalArgumentException("이메일 혹은 패스워드가 잘못되었습니다!");}
     }
@@ -169,9 +140,9 @@ public class MemberControllerImpl implements MemberController{
                 .build();
     }
 
-    public ReturnMemberForm createMemberForm(Member member) {
-        return ReturnMemberForm.builder()
-                .id(member.getId())
+    public ResponseMemberForm createMemberForm(Member member) {
+        return ResponseMemberForm.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .build();

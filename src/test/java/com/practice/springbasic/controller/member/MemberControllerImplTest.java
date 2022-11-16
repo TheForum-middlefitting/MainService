@@ -4,20 +4,20 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.controller.member.dto.LoginMemberForm;
+import com.practice.springbasic.controller.member.vo.LoginMemberForm;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.service.member.dto.MemberDto;
 import com.practice.springbasic.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.Date;
 import java.util.Optional;
@@ -31,7 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(MemberControllerImpl.class)
 class MemberControllerImplTest {
-
+//    @Autowired
+//    ModelMapper modelMapper;
     @Autowired
     MockMvc mockMvc;
     @MockBean
@@ -57,20 +58,20 @@ class MemberControllerImplTest {
 
     @Test
     public void joinMemberSuccess() throws Exception {
-        when(memberService.join(ArgumentMatchers.any(Member.class))).thenReturn(member);
+        when(memberService.join(ArgumentMatchers.any(MemberDto.class))).thenReturn(member);
         String content = objectMapper.writeValueAsString(member);
 
 //        LinkedMultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         ResultActions resultActions = makePostResultActions("/members", content);
 
         resultActions
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(header().exists("Authorization"))
                 .andExpect(header().exists("Refresh"))
                 .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.id").value(member.getId()))
-                .andExpect(jsonPath("$.data.id", equalTo(null)))
+                .andExpect(jsonPath("$.status").value(201))
+                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
                 .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.data.email").value(member.getEmail()));
 //                .andDo(print());
@@ -168,8 +169,8 @@ class MemberControllerImplTest {
                 .andExpect(header().exists("Refresh"))
                 .andExpect(jsonPath("$.message", equalTo("success")))
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.id").value(member.getId()))
-                .andExpect(jsonPath("$.data.id", equalTo(null)))
+                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
                 .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.data.email").value(member.getEmail()));
     }
@@ -206,8 +207,8 @@ class MemberControllerImplTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", equalTo("success")))
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.id").value(member.getId()))
-                .andExpect(jsonPath("$.data.id", equalTo(null)))
+                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
                 .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.data.email").value(member.getEmail()));
     }

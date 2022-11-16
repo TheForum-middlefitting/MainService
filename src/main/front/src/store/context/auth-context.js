@@ -27,6 +27,7 @@ const retrieveStoredToken = () => {
     const sortedExpirationDate = localStorage.getItem("expirationTime");
     const remainingTime = calculateRemainingTime(sortedExpirationDate);
     const memberId = localStorage.getItem("id");
+    console.log(memberId)
     return {
         authorization: storedAuthorizationToken,
         refresh: storedRefreshToken,
@@ -68,13 +69,13 @@ export const AuthContextProvider = (props) => {
     const loginHandler = (response) => {
         setAuthorizationToken(response?.headers?.authorization);
         setRefreshToken(response?.headers?.refresh)
-        setId(response?.data?.data?.id)
+        setId(response?.data?.data?.memberId)
         const expirationTime = new Date(new Date().getTime() + 29 * 60 * 1000)
         //문자열이어야 한다는 것에 유념한다.
         localStorage.setItem("expirationTime", expirationTime.toISOString())
         localStorage.setItem("authorization", response?.headers?.authorization)
         localStorage.setItem("refresh", response?.headers?.refresh)
-        localStorage.setItem("id", response?.data?.data?.id)
+        localStorage.setItem("id", response?.data?.data?.memberId)
         localStorage.setItem("nickname", response?.data?.data?.nickname)
         localStorage.setItem("email", response?.data?.data?.email)
     };

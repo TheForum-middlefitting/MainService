@@ -21,7 +21,10 @@ public class ExControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ConstraintViolationException.class)
     public ErrorResult constraintViolationExHandler(ConstraintViolationException e) {
-        String message = e.getMessage().split("\\.", 2)[1];
+        String message = e.getMessage()
+                .split(",", 2)[0]
+                .split(":", 2)[1]
+                .trim();
         return new ErrorResult("BAD_REQUEST", "입력 값이 잘못되었습니다", 400);
 //        return new ErrorResult("BAD_REQUEST", message, 400);
     }

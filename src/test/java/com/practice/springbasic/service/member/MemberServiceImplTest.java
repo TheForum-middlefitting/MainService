@@ -1,46 +1,67 @@
 package com.practice.springbasic.service.member;
 
+import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.service.member.dto.MemberDto;
 import com.practice.springbasic.repository.member.MemberJpaRepository;
-import com.practice.springbasic.service.member.MemberServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 @Transactional
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MemberServiceImplTest {
-
     @Mock MemberJpaRepository memberRepository;
-    @InjectMocks
+
+    @Autowired
+    ModelMapper modelMapper;
+
+//    @InjectMocks
     MemberServiceImpl memberService;
-    private Member member;
 
     @BeforeEach
-    public void initialize() {
+    void setup() {
         MockitoAnnotations.openMocks(this);
+        memberService = new MemberServiceImpl(memberRepository, modelMapper);
     }
+    private Member member;
+    private MemberDto memberDto;
 
     @BeforeEach
     public void createMember() {
         member = memberSample();
+        memberDto = MemberDto.builder()
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .nickname(member.getNickname())
+                .build();
     }
 
     @Test
     public void memberJoinSuccess() throws Exception {
-        when(memberRepository.save(member)).thenReturn(member);
+        when(memberRepository.save(any(Member.class))).thenReturn(null);
 
-        Member result = memberService.join(member);
+        Member result = memberService.join(memberDto);
 
-        assertThat(result).isEqualTo(member);
+        assertThat(result.getPassword()).isEqualTo(memberDto.getPassword());
+        assertThat(result.getNickname()).isEqualTo(memberDto.getNickname());
+        assertThat(result.getEmail()).isEqualTo(memberDto.getEmail());
+
     }
 
     @Test

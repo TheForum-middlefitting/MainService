@@ -75,7 +75,7 @@ export default function BoardInfoContent(props: any) {
         </div>
     )
     const dateTimeString = getDateTime(props.boardsInfoData.regDate);
-
+    console.log(authCtx.id,  props.boardsInfoData.memberId)
     return (
         <>
             <br/>

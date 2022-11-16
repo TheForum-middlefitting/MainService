@@ -140,7 +140,7 @@ export default function CommentsListElement(props: any) {
     };
 
     const buttonLayout = () => {
-        if (authCtx.id == props.membersId) {
+        if (authCtx.id == props.memberId) {
             if (isLoading) {
                 return (
                     <div>

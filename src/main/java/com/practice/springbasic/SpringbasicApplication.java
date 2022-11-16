@@ -1,5 +1,8 @@
 package com.practice.springbasic;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +16,16 @@ public class SpringbasicApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbasicApplication.class, args);
+	}
+
+	@Bean
+	public ModelMapper modelMapper() {
+		ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration()
+				.setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
+				.setFieldMatchingEnabled(true)
+				.setMatchingStrategy(MatchingStrategies.STRICT);
+		return mapper;
 	}
 
 //	@Bean

@@ -70,7 +70,7 @@ export default function CommentsList(props: any) {
             return <CommentsListElement
                 key={"comment" + comment.id}
                 id={comment.id}
-                membersId={comment.memberId}
+                memberId={comment.memberId}
                 nickname={comment.nickname}
                 content={comment.content}
                 boardsId={props.boardsId}

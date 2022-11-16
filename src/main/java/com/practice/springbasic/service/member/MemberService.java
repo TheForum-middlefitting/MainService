@@ -1,13 +1,13 @@
 package com.practice.springbasic.service.member;
 
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.domain.member.dto.MemberDto;
+import com.practice.springbasic.service.member.dto.MemberDto;
 
 import java.util.Optional;
 
 public interface MemberService {
 
-    Member join(Member member);
+    Member join(MemberDto memberDto);
 
     Optional<Member> find(String nickname, String password);
 
