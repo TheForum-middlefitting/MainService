@@ -19,6 +19,7 @@ import java.util.List;
 
 import static com.practice.springbasic.domain.comment.QComment.comment;
 
+
 public class CommentRepositoryImpl implements CommentRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 

@@ -5,7 +5,6 @@ import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.repository.board.dto.BoardPageDto;
 import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.repository.board.dto.QBoardPageDto;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;

@@ -71,6 +71,12 @@ public class ExControllerAdvice {
         return new ErrorResult("UNKNOWN_ERROR", "알 수 없는 오류", 404);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler
+    public ErrorResult exHandler(NullPointerException e) {
+        return new ErrorResult("UNKNOWN_ERROR", e.getMessage(), 404);
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorResult dataIntegrityViolationExHandler(DataIntegrityViolationException e) {

@@ -5,6 +5,7 @@ import com.practice.springbasic.controller.form.SuccessCreatedResult;
 import com.practice.springbasic.controller.member.vo.RequestMemberForm;
 import com.practice.springbasic.controller.member.vo.ResponseMemberForm;
 import com.practice.springbasic.service.member.dto.MemberDto;
+import com.practice.springbasic.utils.chek.CommonCheckUtil;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.member.vo.LoginMemberForm;
 import com.practice.springbasic.controller.utils.CheckUtil;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static com.practice.springbasic.config.error.ErrorMessage.LoginFailedByWrongInput;
 
 @RestController
 @Validated
@@ -57,8 +60,7 @@ public class MemberControllerImpl implements MemberController{
     public SuccessResult loginMember(HttpServletResponse response, @RequestBody LoginMemberForm loginMemberForm, BindingResult bindingResult) {
         CheckUtil.bindingResultCheck(bindingResult.hasErrors());
         Member member =  memberService.find(loginMemberForm.getEmail(), loginMemberForm.getPassword()).orElse(null);
-        memberNullCheck(member);
-        assert member != null;
+        CommonCheckUtil.nullCheck401(member, LoginFailedByWrongInput);
 
         String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
         String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());

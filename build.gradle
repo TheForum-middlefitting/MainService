@@ -81,7 +81,8 @@ configurations {
 	querydsl.extendsFrom compileClasspath
 }
 
-def frontendDir = "$projectDir/src/main/front"
+//def frontendDir = "$projectDir/src/main/front"
+def frontendDir = "../ClientWeb"
 
 sourceSets {
 	main {
