@@ -1,7 +1,7 @@
 package com.practice.springbasic.controller.exhandler;
 
 import com.auth0.jwt.exceptions.*;
-import com.practice.springbasic.controller.form.ErrorResult;
+import com.practice.springbasic.controller.utils.form.ErrorResult;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,21 +12,32 @@ import javax.validation.ConstraintViolationException;
 
 @RestControllerAdvice(basePackages = "com.practice.springbasic.controller")
 public class ExControllerAdvice {
+    public String[] errorMsgParse(String message) {
+        String[] result = {"", ""};
+        String[] err = message.split("@", 2);
+        if (err.length == 2) {
+            result = new String[]{err[0], err[1]};
+        }
+        return result;
+    }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
     public ErrorResult illegalArgumentExHandler(IllegalArgumentException e) {
-        return new ErrorResult("BAD_REQUEST", e.getMessage(), 400);
+        String[] errorArr = errorMsgParse(e.getMessage());
+        return new ErrorResult(errorArr[0], errorArr[1], 400);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ConstraintViolationException.class)
     public ErrorResult constraintViolationExHandler(ConstraintViolationException e) {
-        String message = e.getMessage()
+        String[] errorArr = e.getMessage()
                 .split(",", 2)[0]
                 .split(":", 2)[1]
-                .trim();
-        return new ErrorResult("BAD_REQUEST", "입력 값이 잘못되었습니다", 400);
-//        return new ErrorResult("BAD_REQUEST", message, 400);
+                .trim().split("@");
+//        return new ErrorResult("BAD_REQUEST", "입력 값이 잘못되었습니다", 400);
+        String message = errorArr.length == 2 ? errorArr[1] : "";
+        String code = errorArr.length == 2 ? errorArr[0] : "";
+        return new ErrorResult(code, message, 400);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

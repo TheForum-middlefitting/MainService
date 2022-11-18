@@ -1,8 +1,6 @@
 package com.practice.springbasic.controller.member;
 
-import com.practice.springbasic.controller.member.dto.EmailCheckForm;
-import com.practice.springbasic.controller.member.dto.NicknameCheckForm;
-import com.practice.springbasic.controller.utils.CheckUtil;
+import com.practice.springbasic.controller.utils.check.CheckUtil;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +9,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

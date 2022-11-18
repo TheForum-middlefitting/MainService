@@ -3,8 +3,8 @@ package com.practice.springbasic.controller.comment;
 import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.comment.dto.ReturnSingleCommentForm;
-import com.practice.springbasic.controller.form.SuccessResult;
-import com.practice.springbasic.controller.utils.CheckUtil;
+import com.practice.springbasic.controller.utils.form.SuccessResult;
+import com.practice.springbasic.controller.utils.check.CheckUtil;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
+@RequestMapping("/comment-service")
 public class CommentControllerImpl implements CommentController{
     private final BoardService boardService;
     private final MemberService memberService;

@@ -38,6 +38,10 @@ dependencies {
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5'
 	implementation group: 'com.auth0', name: 'java-jwt', version: '3.16.0'
 	implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.1.0'
+	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-eureka-client
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.1.4'
+
+
 	//querydsl 추가
 	implementation 'com.querydsl:querydsl-jpa'
 	//querydsl 추가
@@ -82,7 +86,7 @@ configurations {
 }
 
 //def frontendDir = "$projectDir/src/main/front"
-def frontendDir = "../ClientWeb"
+def frontendDir = "../client-web"
 
 sourceSets {
 	main {

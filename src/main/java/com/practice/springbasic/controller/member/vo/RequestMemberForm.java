@@ -8,15 +8,19 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
+import static com.practice.springbasic.config.error.ErrorMessage.*;
+
 @Getter
 public class RequestMemberForm {
-    @NotNull @NotEmpty @Email
+    @NotEmpty(message = EmailEmpty)
+    @Email(message = EmailForm)
     String email;
-    @NotNull
-    @NotEmpty @Length(min=4, max=20)
+    @NotEmpty(message = NicknameEmpty)
+    @Length(min=4, max=20, message = NicknameLen)
     String nickname;
 
-    @NotNull @NotEmpty @Length(min=10, max=20)
+    @NotEmpty(message = PasswordEmpty)
+    @Length(min=10, max=20, message = PasswordLen)
     String password;
 
     @Builder

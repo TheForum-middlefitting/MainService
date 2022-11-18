@@ -81,7 +81,7 @@ class CommentControllerImplTest {
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
         String content = objectMapper.writeValueAsString(commentDto);
 
-        ResultActions resultActions = makePostResultActions("/boards/1/comments", content, jwtToken);
+        ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -97,7 +97,7 @@ class CommentControllerImplTest {
     void findSingleCommentSuccess() throws Exception{
         when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
 
-        ResultActions resultActions = makeGetResultActions("/boards/1/comments/1");
+        ResultActions resultActions = makeGetResultActions("/comment-service/boards/1/comments/1");
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -121,7 +121,7 @@ class CommentControllerImplTest {
 
         String content = objectMapper.writeValueAsString(commentDto);
 
-        ResultActions resultActions = makePutResultActions("/boards/1/comments/1", content, jwtToken);
+        ResultActions resultActions = makePutResultActions("/comment-service/boards/1/comments/1", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -145,7 +145,7 @@ class CommentControllerImplTest {
 
         String content = objectMapper.writeValueAsString(commentDto);
 
-        ResultActions resultActions = makePutResultActions("/boards/1/comments/1", content, jwtToken);
+        ResultActions resultActions = makePutResultActions("/comment-service/boards/1/comments/1", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
@@ -163,7 +163,7 @@ class CommentControllerImplTest {
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        ResultActions resultActions = makeDeleteResultActions("/boards/1/comments/1", jwtToken);
+        ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -181,7 +181,7 @@ class CommentControllerImplTest {
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        ResultActions resultActions = makeDeleteResultActions("/boards/1/comments/1", jwtToken);
+        ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
@@ -199,7 +199,7 @@ class CommentControllerImplTest {
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        ResultActions resultActions = makePostResultActions("/boards/1/comments/next/", content, jwtToken);
+        ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments/next/", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))

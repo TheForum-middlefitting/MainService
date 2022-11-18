@@ -1,4 +1,4 @@
-package com.practice.springbasic.controller.utils;
+package com.practice.springbasic.controller.utils.check;
 
 public class CheckUtil {
     public static void bindingResultCheck(boolean bindingResultHasError) {

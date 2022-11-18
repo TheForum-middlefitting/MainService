@@ -74,7 +74,7 @@ class BoardControllerImplTest {
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
         String content = objectMapper.writeValueAsString(boardDto);
 
-        ResultActions resultActions = makePostResultActions("/boards", content, jwtToken);
+        ResultActions resultActions = makePostResultActions("/board-service/boards", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -92,7 +92,7 @@ class BoardControllerImplTest {
     void findSingleBoardSuccess() throws Exception{
         when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
 
-        ResultActions resultActions = makeGetResultActions("/boards/1");
+        ResultActions resultActions = makeGetResultActions("/board-service/boards/1");
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -118,7 +118,7 @@ class BoardControllerImplTest {
 
         String content = objectMapper.writeValueAsString(boardDto);
 
-        ResultActions resultActions = makePutResultActions("/boards/1", content, jwtToken);
+        ResultActions resultActions = makePutResultActions("/board-service/boards/1", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -144,7 +144,7 @@ class BoardControllerImplTest {
 
         String content = objectMapper.writeValueAsString(boardDto);
 
-        ResultActions resultActions = makePutResultActions("/boards/1", content, jwtToken);
+        ResultActions resultActions = makePutResultActions("/board-service/boards/1", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
@@ -162,7 +162,7 @@ class BoardControllerImplTest {
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        ResultActions resultActions = makeDeleteResultActions("/boards/1", jwtToken);
+        ResultActions resultActions = makeDeleteResultActions("/board-service/boards/1", jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))
@@ -179,7 +179,7 @@ class BoardControllerImplTest {
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        ResultActions resultActions = makeDeleteResultActions("/boards/1", jwtToken);
+        ResultActions resultActions = makeDeleteResultActions("/board-service/boards/1", jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
@@ -197,7 +197,7 @@ class BoardControllerImplTest {
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        ResultActions resultActions = makePostResultActions("/boards/offset/", content, jwtToken);
+        ResultActions resultActions = makePostResultActions("/board-service/boards/offset/", content, jwtToken);
 
         resultActions
                 .andExpect(jsonPath("$.message", equalTo("success")))

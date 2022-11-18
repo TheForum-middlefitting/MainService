@@ -3,8 +3,8 @@ package com.practice.springbasic.controller.board;
 import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.board.dto.ReturnSingleBoardForm;
-import com.practice.springbasic.controller.utils.CheckUtil;
-import com.practice.springbasic.controller.form.SuccessResult;
+import com.practice.springbasic.controller.utils.check.CheckUtil;
+import com.practice.springbasic.controller.utils.form.SuccessResult;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
 import com.practice.springbasic.domain.member.Member;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
+@RequestMapping("/board-service")
 public class BoardControllerImpl implements BoardController{
     private final BoardService boardService;
     private final MemberService memberService;

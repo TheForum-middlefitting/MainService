@@ -1,4 +1,4 @@
-package com.practice.springbasic.controller.form;
+package com.practice.springbasic.controller.utils.form;
 
 import lombok.Getter;
 

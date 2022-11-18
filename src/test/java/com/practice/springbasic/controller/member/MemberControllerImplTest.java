@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Date;
 import java.util.Optional;
 
+import static com.practice.springbasic.config.error.ErrorMessage.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.when;
@@ -53,7 +54,7 @@ class MemberControllerImplTest {
         member = memberSample("middlefitting@google.com", "%middlefitting", "middlefitting");
         FailedEmailParsingMember = memberSample("middle", "%middlefitting", "middlefitting");
         FailedPasswordParsingMember = memberSample("middlefitting@google.com", "%mid", "middlefitting");
-        FailedNicknameParsingMember = memberSample("middlefitting@google.com", "%middlefitting", "");
+        FailedNicknameParsingMember = memberSample("middlefitting@google.com", "%middlefitting", "m");
     }
 
     @Test
@@ -62,7 +63,7 @@ class MemberControllerImplTest {
         String content = objectMapper.writeValueAsString(member);
 
 //        LinkedMultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        ResultActions resultActions = makePostResultActions("/members", content);
+        ResultActions resultActions = makePostResultActions("/member-service/members", content);
 
         resultActions
                 .andExpect(status().isCreated())
@@ -78,49 +79,49 @@ class MemberControllerImplTest {
     }
 
     @Test
-    public void joinMemberFailedByEmailParsingError() throws Exception {
+    public void joinMemberFailedByEmailFormError() throws Exception {
         String content = objectMapper.writeValueAsString(FailedEmailParsingMember);
 
-        ResultActions resultActions = makePostResultActions("/members", content);
+        ResultActions resultActions = makePostResultActions("/member-service/members", content);
 
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다")))
+                .andExpect(jsonPath("$.code", equalTo(EmailForm.split("@")[0])))
+                .andExpect(jsonPath("$.message", equalTo(EmailForm.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
 
     @Test
-    public void joinMemberFailedByNicknameParsingError() throws Exception {
+    public void joinMemberFailedByNicknameLenError() throws Exception {
         String content = objectMapper.writeValueAsString(FailedNicknameParsingMember);
 
-        ResultActions resultActions = makePostResultActions("/members", content);
+        ResultActions resultActions = makePostResultActions("/member-service/members", content);
 
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다")))
+                .andExpect(jsonPath("$.code", equalTo(NicknameLen.split("@")[0])))
+                .andExpect(jsonPath("$.message", equalTo(NicknameLen.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
 
     @Test
-    public void joinMemberFailedByPasswordParsingError() throws Exception {
+    public void joinMemberFailedByPasswordLenError() throws Exception {
         String content = objectMapper.writeValueAsString(FailedPasswordParsingMember);
 
-        ResultActions resultActions = makePostResultActions("/members", content);
+        ResultActions resultActions = makePostResultActions("/member-service/members", content);
 
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다")))
+                .andExpect(jsonPath("$.code", equalTo(PasswordLen.split("@")[0])))
+                .andExpect(jsonPath("$.message", equalTo(PasswordLen.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
@@ -130,14 +131,14 @@ class MemberControllerImplTest {
         when(memberService.duplicateEmail(ArgumentMatchers.anyString())).thenReturn(true);
         String content = objectMapper.writeValueAsString(member);
 
-        ResultActions resultActions = makePostResultActions("/members", content);
+        ResultActions resultActions = makePostResultActions("/member-service/members", content);
 
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("중복된 이메일입니다")))
+                .andExpect(jsonPath("$.code", equalTo(DuplicateEmail.split("@")[0])))
+                .andExpect(jsonPath("$.message", equalTo(DuplicateEmail.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
@@ -146,14 +147,14 @@ class MemberControllerImplTest {
         when(memberService.duplicateNickname(member.getNickname())).thenReturn(true);
         String content = objectMapper.writeValueAsString(member);
 
-        ResultActions resultActions = makePostResultActions("/members", content);
+        ResultActions resultActions = makePostResultActions("/member-service/members", content);
 
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("중복된 닉네임입니다")))
+                .andExpect(jsonPath("$.code", equalTo(DuplicateNickname.split("@")[0])))
+                .andExpect(jsonPath("$.message", equalTo(DuplicateNickname.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
@@ -162,7 +163,7 @@ class MemberControllerImplTest {
         when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(member));
         LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
         String content = objectMapper.writeValueAsString(loginMemberForm);
-        ResultActions resultActions = makePostResultActions("/members/login", content);
+        ResultActions resultActions = makePostResultActions("/member-service/members/login", content);
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Authorization"))
@@ -180,13 +181,13 @@ class MemberControllerImplTest {
         when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(null));
         LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
         String content = objectMapper.writeValueAsString(loginMemberForm);
-        ResultActions resultActions = makePostResultActions("/members/login", content);
+        ResultActions resultActions = makePostResultActions("/member-service/members/login", content);
 
         resultActions
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
+                .andExpect(jsonPath("$.code", equalTo("1000")))
                 .andExpect(jsonPath("$.message", equalTo("이메일 혹은 패스워드가 잘못되었습니다!")))
                 .andExpect(jsonPath("$.status").value(400));
     }
@@ -201,7 +202,7 @@ class MemberControllerImplTest {
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
 
-        ResultActions resultActions = makePutResultActions("/members/1", content, jwtToken);
+        ResultActions resultActions = makePutResultActions("/member-service/members/1", content, jwtToken);
 
         resultActions
                 .andExpect(status().isOk())
@@ -215,12 +216,14 @@ class MemberControllerImplTest {
 
     @Test
     public void nicknameDuplicateFalse() throws Exception {
-        ResultActions resultActions = makeGetResultActions("/members/email-check?email=middle");
+        when(memberService.duplicateNickname(ArgumentMatchers.any())).thenReturn(true);
+
+        ResultActions resultActions = makeGetResultActions("/member-service/members/nickname-check?nickname=middle");
 
         resultActions
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-                .andExpect(jsonPath("$.message", equalTo("입력 값이 잘못되었습니다")))
+                .andExpect(jsonPath("$.code", equalTo(DuplicateNickname.split("@")[0])))
+                .andExpect(jsonPath("$.message", equalTo(DuplicateNickname.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
@@ -233,7 +236,7 @@ class MemberControllerImplTest {
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
-        ResultActions resultActions = makeDeleteResultActions("/members/1/%middlefitting", jwtToken);
+        ResultActions resultActions = makeDeleteResultActions("/member-service/members/1/%middlefitting", jwtToken);
 
         resultActions
                 .andExpect(status().isOk())

@@ -1,10 +1,9 @@
 package com.practice.springbasic.controller.member;
 
-import com.practice.springbasic.controller.form.SuccessCreatedResult;
+import com.practice.springbasic.controller.utils.form.SuccessCreatedResult;
 import com.practice.springbasic.controller.member.vo.LoginMemberForm;
-import com.practice.springbasic.controller.form.SuccessResult;
+import com.practice.springbasic.controller.utils.form.SuccessResult;
 import com.practice.springbasic.controller.member.vo.RequestMemberForm;
-import com.practice.springbasic.controller.member.vo.ResponseMemberForm;
 import com.practice.springbasic.domain.member.Member;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ import javax.validation.constraints.NotEmpty;
 public interface MemberController {
     ResponseEntity<SuccessCreatedResult> joinMember(HttpServletResponse response, @Valid RequestMemberForm requestUserForm, BindingResult bindingResult);
 
-    SuccessResult loginMember(HttpServletResponse response, LoginMemberForm loginMemberForm, BindingResult bindingResult);
+    ResponseEntity<SuccessResult> loginMember(HttpServletResponse response, @Valid LoginMemberForm loginMemberForm, BindingResult bindingResult);
     SuccessResult getMember(HttpServletRequest request, Long id);
 
     SuccessResult updateMember(HttpServletRequest request, Long id, Member member, BindingResult bindingResult);

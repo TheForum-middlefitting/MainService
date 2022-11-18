@@ -1,15 +1,15 @@
 package com.practice.springbasic.controller.member;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.controller.form.SuccessCreatedResult;
+import com.practice.springbasic.controller.utils.form.SuccessCreatedResult;
 import com.practice.springbasic.controller.member.vo.RequestMemberForm;
 import com.practice.springbasic.controller.member.vo.ResponseMemberForm;
 import com.practice.springbasic.service.member.dto.MemberDto;
 import com.practice.springbasic.utils.chek.CommonCheckUtil;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.member.vo.LoginMemberForm;
-import com.practice.springbasic.controller.utils.CheckUtil;
-import com.practice.springbasic.controller.form.SuccessResult;
+import com.practice.springbasic.controller.utils.check.CheckUtil;
+import com.practice.springbasic.controller.utils.form.SuccessResult;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
 import org.modelmapper.ModelMapper;
@@ -22,9 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.practice.springbasic.config.error.ErrorMessage.LoginFailedByWrongInput;
+import static com.practice.springbasic.config.error.ErrorMessage.*;
 
 @RestController
+@RequestMapping("/member-service")
 @Validated
 public class MemberControllerImpl implements MemberController{
 
@@ -57,16 +58,17 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PostMapping("/members/login")
-    public SuccessResult loginMember(HttpServletResponse response, @RequestBody LoginMemberForm loginMemberForm, BindingResult bindingResult) {
+    public ResponseEntity<SuccessResult> loginMember(HttpServletResponse response, @RequestBody LoginMemberForm loginMemberForm, BindingResult bindingResult) {
         CheckUtil.bindingResultCheck(bindingResult.hasErrors());
+
         Member member =  memberService.find(loginMemberForm.getEmail(), loginMemberForm.getPassword()).orElse(null);
-        CommonCheckUtil.nullCheck401(member, LoginFailedByWrongInput);
+        CommonCheckUtil.nullCheck400(member, LoginFailedByWrongInput);
 
         String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
         String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
         response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
         response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
-        return new SuccessResult(createMemberForm(member));
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResult(createMemberForm(member)));
     }
 
     @Override
@@ -74,8 +76,7 @@ public class MemberControllerImpl implements MemberController{
     public SuccessResult getMember(HttpServletRequest request, @PathVariable Long id) {
         JwtUtils.verifyJwtToken(request, id, JwtProperties.ACCESS_HEADER_STRING);
         Member member = memberService.findMemberById(id).orElse(null);
-        memberInfoNullCheck(member);
-        assert member != null;
+        CommonCheckUtil.nullCheck404(member, MemberNotFound);
         return new SuccessResult(createMemberForm(member));
     }
 
@@ -110,9 +111,8 @@ public class MemberControllerImpl implements MemberController{
     @GetMapping("/members/nickname-check")
     public SuccessResult nicknameDuplicateCheck(
             @RequestParam("nickname") String nickname) {
-        if(memberService.duplicateNickname(nickname)) {
-            throw new IllegalArgumentException("중복된 닉네임입니다");
-        }
+        boolean result = memberService.duplicateNickname(nickname);
+        CommonCheckUtil.duplicateCheck400(result, DuplicateNickname);
         return new SuccessResult(null);
     }
 
@@ -120,9 +120,8 @@ public class MemberControllerImpl implements MemberController{
     @GetMapping("/members/email-check")
     public SuccessResult emailDuplicateCheck(
             @RequestParam("email") String email) {
-        if(memberService.duplicateEmail(email)) {
-            throw new IllegalArgumentException("중복된 이메일입니다");
-        }
+        boolean result = memberService.duplicateEmail(email);
+        CommonCheckUtil.duplicateCheck400(result, DuplicateEmail);
         return new SuccessResult(null);
     }
 

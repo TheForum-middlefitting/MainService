@@ -51,7 +51,7 @@ class JwtControllerImplTest {
 
     @Test
     public void updateAccessTokenSuccess() throws Exception{
-        ResultActions resultActions = makeResultActions("/tokens/1", accessExpireToken, refreshToken);
+        ResultActions resultActions = makeResultActions("/member-service/tokens/1", accessExpireToken, refreshToken);
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Authorization"))
@@ -72,7 +72,7 @@ class JwtControllerImplTest {
 
     @Test
     public void updateAccessTokenFailedByBothExpired() throws Exception{
-        ResultActions resultActions = makeResultActions("/tokens/1", accessExpireToken, refreshExpireToken);
+        ResultActions resultActions = makeResultActions("/member-service/tokens/1", accessExpireToken, refreshExpireToken);
         resultActions
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().doesNotExist("Authorization"))
@@ -83,7 +83,7 @@ class JwtControllerImplTest {
 
     @Test
     public void updateAccessTokenFailedById() throws Exception{
-        ResultActions resultActions = makeResultActions("/tokens/2", accessToken, refreshToken);
+        ResultActions resultActions = makeResultActions("/member-service/tokens/2", accessToken, refreshToken);
         resultActions
                 .andExpect(status().isForbidden())
                 .andExpect(header().doesNotExist("Authorization"))
