@@ -1,10 +1,9 @@
 package com.practice.springbasic.controller.member;
 
-import com.practice.springbasic.controller.utils.form.SuccessCreatedResult;
 import com.practice.springbasic.controller.member.vo.LoginMemberForm;
-import com.practice.springbasic.controller.utils.form.SuccessResult;
 import com.practice.springbasic.controller.member.vo.RequestMemberForm;
-import com.practice.springbasic.domain.member.Member;
+import com.practice.springbasic.controller.member.vo.ResponseMemberForm;
+import com.practice.springbasic.controller.utils.form.SuccessResult;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -15,15 +14,23 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
+import static com.practice.springbasic.config.error.ErrorMessage.PasswordEmpty;
+import static com.practice.springbasic.config.error.ErrorMessage.PasswordLen;
+
 public interface MemberController {
-    ResponseEntity<SuccessCreatedResult> joinMember(HttpServletResponse response, @Valid RequestMemberForm requestUserForm, BindingResult bindingResult);
+    ResponseEntity<ResponseMemberForm> joinMember(HttpServletResponse response, @Valid RequestMemberForm requestUserForm, BindingResult bindingResult);
 
-    ResponseEntity<SuccessResult> loginMember(HttpServletResponse response, @Valid LoginMemberForm loginMemberForm, BindingResult bindingResult);
-    SuccessResult getMember(HttpServletRequest request, Long id);
+    ResponseEntity<ResponseMemberForm> loginMember(HttpServletResponse response, @Valid LoginMemberForm loginMemberForm, BindingResult bindingResult);
+    ResponseEntity<ResponseMemberForm> getMember(HttpServletRequest request, Long memberId);
 
-    SuccessResult updateMember(HttpServletRequest request, Long id, Member member, BindingResult bindingResult);
+    ResponseEntity<ResponseMemberForm> updateMember(HttpServletRequest request, Long memberId, @Valid RequestMemberForm requestMemberForm, BindingResult bindingResult);
 
-    SuccessResult deleteMember(HttpServletRequest request, Long id, String password);
+    SuccessResult deleteMember(
+            HttpServletRequest request,
+            Long memberId,
+            @NotEmpty(message = PasswordEmpty)
+            @Length(min=10, max=20, message = PasswordLen)
+            String password);
 
     SuccessResult nicknameDuplicateCheck(@NotEmpty @Length(min=4, max=20, message = "닉네임은 4자에서 20자 사이로 입력하세요!") String nickname);
 

@@ -6,11 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.controller.member.vo.LoginMemberForm;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.service.member.dto.MemberDto;
 import com.practice.springbasic.service.member.MemberService;
+import com.practice.springbasic.service.member.dto.MemberDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentMatchers;
+import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,7 +24,6 @@ import java.util.Date;
 import java.util.Optional;
 
 import static com.practice.springbasic.config.error.ErrorMessage.*;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -39,6 +39,10 @@ class MemberControllerImplTest {
     @MockBean
     MemberService memberService;
 
+    @Autowired
+    ModelMapper modelMapper;
+
+    MemberControllerImpl memberController;
     //편한데 오래된 방식이라 나온다 
     //LinkedMultiValueMap<String, String> 를 통해 추후 변경
     @Autowired
@@ -49,6 +53,11 @@ class MemberControllerImplTest {
     private Member FailedPasswordParsingMember;
     private Member FailedNicknameParsingMember;
 
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+        memberController = new MemberControllerImpl(memberService, modelMapper);
+    }
     @BeforeEach
     public void createMember() {
         member = memberSample("middlefitting@google.com", "%middlefitting", "middlefitting");
@@ -69,12 +78,16 @@ class MemberControllerImplTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Authorization"))
                 .andExpect(header().exists("Refresh"))
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(201))
-                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
-                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+                .andExpect(jsonPath("$.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.memberId", equalTo(null)))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
+//                .andExpect(jsonPath("$.message", equalTo("success")))
+//                .andExpect(jsonPath("$.status").value(201))
+//                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
+//                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
+//                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
+//                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
 //                .andDo(print());
     }
 
@@ -160,7 +173,7 @@ class MemberControllerImplTest {
 
     @Test
     public void loginMemberSuccess() throws Exception {
-        when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(member));
+        when(memberService.findMemberByEmailAndPassword(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(member));
         LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
         String content = objectMapper.writeValueAsString(loginMemberForm);
         ResultActions resultActions = makePostResultActions("/member-service/members/login", content);
@@ -168,17 +181,21 @@ class MemberControllerImplTest {
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Authorization"))
                 .andExpect(header().exists("Refresh"))
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
-                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+                .andExpect(jsonPath("$.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.memberId", equalTo(null)))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
+//                .andExpect(jsonPath("$.message", equalTo("success")))
+//                .andExpect(jsonPath("$.status").value(200))
+//                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
+//                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
+//                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
+//                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
     }
 
     @Test
     public void loginMemberFailed() throws Exception {
-        when(memberService.find(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(null));
+        when(memberService.findMemberByEmailAndPassword(member.getEmail(), member.getPassword())).thenReturn(Optional.empty());
         LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
         String content = objectMapper.writeValueAsString(loginMemberForm);
         ResultActions resultActions = makePostResultActions("/member-service/members/login", content);
@@ -193,8 +210,65 @@ class MemberControllerImplTest {
     }
 
     @Test
+    public void getMemberSuccess() throws Exception {
+        when(memberService.findMemberById(1L)).thenReturn(Optional.ofNullable(member));
+        String jwtToken = JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withClaim("id", 1)
+                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+
+        ResultActions resultActions = makeGetResultActions("/member-service/members/1", jwtToken);
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.memberId", equalTo(null)))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
+    }
+
+    @Test
+    public void getMemberFailedByTokenAuthFailed() throws Exception {
+        when(memberService.findMemberById(1L)).thenReturn(Optional.ofNullable(member));
+        String jwtToken = JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withClaim("id", 2)
+                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+
+        ResultActions resultActions = makeGetResultActions("/member-service/members/1", jwtToken);
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])))
+                .andExpect(jsonPath("$.message").value(AuthFailed.split("@")[1]))
+                .andExpect(jsonPath("$.status").value(401));
+    }
+
+    @Test
+    public void getMemberFailedBy404Member() throws Exception {
+        when(memberService.findMemberById(1L)).thenReturn(Optional.ofNullable(member));
+        when(memberService.findMemberById(2L)).thenReturn(Optional.empty());
+        String jwtToken = JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withClaim("id", 2)
+                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+
+        ResultActions resultActions = makeGetResultActions("/member-service/members/2", jwtToken);
+
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code", equalTo(MemberNotFound.split("@")[0])))
+                .andExpect(jsonPath("$.message").value(MemberNotFound.split("@")[1]))
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+
+    @Test
     public void updateMemberSuccess() throws Exception {
-        when(memberService.find(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(member));
+        when(memberService.findMemberByEmailAndPassword(ArgumentMatchers.any(), ArgumentMatchers.anyString())).thenReturn(Optional.ofNullable(member));
         String content = objectMapper.writeValueAsString(member);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
@@ -206,12 +280,12 @@ class MemberControllerImplTest {
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
-                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+//                .andExpect(jsonPath("$.message", equalTo("success")))
+//                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.memberId").value(member.getId()))
+                .andExpect(jsonPath("$.memberId", equalTo(null)))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
     }
 
     @Test
@@ -230,13 +304,13 @@ class MemberControllerImplTest {
 
     @Test
     public void deleteMemberSuccess() throws Exception {
-        when(memberService.findMemberByIdAndPassword(1L, member.getPassword())).thenReturn(Optional.ofNullable(member));
+//        when(memberService.findMemberByIdAndPassword(1L, member.getPassword())).thenReturn(Optional.ofNullable(member));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
                 .withClaim("id", 1)
                 .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
-        ResultActions resultActions = makeDeleteResultActions("/member-service/members/1/%middlefitting", jwtToken);
+        ResultActions resultActions = makeDeleteResultActions("/member-service/members/1?password=%middlefitting", jwtToken);
 
         resultActions
                 .andExpect(status().isOk())
@@ -280,19 +354,19 @@ class MemberControllerImplTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
+    ResultActions makeGetResultActions(String url, String jwtToken) throws Exception {
+        return mockMvc.perform(get(url)
+                        .header("Authorization", jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
     private Member memberSample(String email, String password, String nickname) {
         return Member.builder()
                 .email(email)
                 .password(password)
                 .nickname(nickname)
-                .build();
-    }
-
-    private MemberDto memberDtoSample() {
-        return MemberDto.builder()
-                .email("middlefitting@google.com")
-                .password("%middlefitting")
-                .nickname("middlefitting2")
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package com.practice.springbasic.controller.exhandler;
 
 import com.auth0.jwt.exceptions.*;
 import com.practice.springbasic.controller.utils.form.ErrorResult;
+import com.practice.springbasic.utils.error.exception.AuthenticationFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,10 +35,16 @@ public class ExControllerAdvice {
                 .split(",", 2)[0]
                 .split(":", 2)[1]
                 .trim().split("@");
-//        return new ErrorResult("BAD_REQUEST", "입력 값이 잘못되었습니다", 400);
         String message = errorArr.length == 2 ? errorArr[1] : "";
         String code = errorArr.length == 2 ? errorArr[0] : "";
         return new ErrorResult(code, message, 400);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ErrorResult authenticationFailedExHandler(AuthenticationFailedException e) {
+        String[] errorArr = errorMsgParse(e.getMessage());
+        return new ErrorResult(errorArr[0], errorArr[1], 401);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -78,14 +85,15 @@ public class ExControllerAdvice {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler
-    public ErrorResult exHandler(HttpClientErrorException.NotFound e) {
+    public ErrorResult notFoundExHandler(HttpClientErrorException.NotFound e) {
         return new ErrorResult("UNKNOWN_ERROR", "알 수 없는 오류", 404);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler
-    public ErrorResult exHandler(NullPointerException e) {
-        return new ErrorResult("UNKNOWN_ERROR", e.getMessage(), 404);
+    public ErrorResult notFoundExHandler(NullPointerException e) {
+        String[] errorArr = errorMsgParse(e.getMessage());
+        return new ErrorResult(errorArr[0], errorArr[1], 404);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

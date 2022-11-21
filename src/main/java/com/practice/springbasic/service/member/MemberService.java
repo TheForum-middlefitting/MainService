@@ -9,11 +9,12 @@ public interface MemberService {
 
     Member join(MemberDto memberDto);
 
-    Optional<Member> find(String nickname, String password);
+    Optional<Member> findMemberByEmailAndPassword(String nickname, String password);
 
     Long update(Member member, MemberDto memberUpdateDto);
 
-    void withdrawal(Member member);
+//    void withdrawal(Member member);
+    void withdrawal(Long memberId, String password);
 
     Boolean duplicateEmail(String email);
 

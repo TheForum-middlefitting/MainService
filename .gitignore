@@ -38,4 +38,8 @@ out/
 
 ##Secure
 JwtProperties.java
-*properties*
+
+### Secure ###
+*secret.yml
+*secret.properties
+*secret.env

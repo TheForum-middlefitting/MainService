@@ -2,7 +2,6 @@ package com.practice.springbasic.controller.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.springbasic.config.jwt.JwtProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Date;
 
+import static com.practice.springbasic.config.error.ErrorMessage.AuthFailed;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -23,8 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class JwtControllerImplTest {
     @Autowired
     MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
     String accessToken;
     String refreshToken;
     String accessToken2;
@@ -85,11 +83,11 @@ class JwtControllerImplTest {
     public void updateAccessTokenFailedById() throws Exception{
         ResultActions resultActions = makeResultActions("/member-service/tokens/2", accessToken, refreshToken);
         resultActions
-                .andExpect(status().isForbidden())
+                .andExpect(status().isUnauthorized())
                 .andExpect(header().doesNotExist("Authorization"))
-                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")))
-                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
-                .andExpect(jsonPath("$.status").value(403));
+                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])))
+                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.status").value(401));
     }
 
     ResultActions makeResultActions(String url, String accessToken, String refreshToken) throws Exception {

@@ -1,16 +1,17 @@
 package com.practice.springbasic.service.member;
 
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.service.member.dto.MemberDto;
 import com.practice.springbasic.repository.member.MemberJpaRepository;
+import com.practice.springbasic.service.member.dto.MemberDto;
+import com.practice.springbasic.utils.chek.CommonCheckUtil;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+
+import static com.practice.springbasic.config.error.ErrorMessage.PasswordWrong;
 
 @Transactional
 @Service
@@ -33,7 +34,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Optional<Member> find(String email, String password) {
+    public Optional<Member> findMemberByEmailAndPassword(String email, String password) {
         return memberRepository.findByEmailAndPassword(email, password);
     }
 
@@ -44,8 +45,15 @@ public class MemberServiceImpl implements MemberService {
         return member.getId();
     }
 
+//    @Override
+//    public void withdrawal(Member member){
+//        memberRepository.delete(member);
+//    }
+
     @Override
-    public void withdrawal(Member member){
+    public void withdrawal(Long memberId, String password){
+        Member member = memberRepository.findByIdAndPassword(memberId, password).orElse(null);
+        CommonCheckUtil.nullCheck400(member, PasswordWrong);
         memberRepository.delete(member);
     }
 

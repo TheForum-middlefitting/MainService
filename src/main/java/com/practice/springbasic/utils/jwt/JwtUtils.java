@@ -5,10 +5,14 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.practice.springbasic.config.jwt.JwtProperties;
-import lombok.extern.slf4j.Slf4j;
+import com.practice.springbasic.utils.chek.CommonCheckUtil;
+import com.practice.springbasic.utils.error.exception.AuthenticationFailedException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+
+import static com.practice.springbasic.config.error.ErrorMessage.AuthFailed;
+import static com.practice.springbasic.config.error.ErrorMessage.NoToken;
 
 public class JwtUtils {
 
@@ -31,27 +35,29 @@ public class JwtUtils {
 
     public static String generateExtendJwtToken(HttpServletRequest request, Long id) {
         try {
-            verifyJwtToken(request, id, JwtProperties.ACCESS_HEADER_STRING);
+            verifyJwtTokenAndAuthority(request, id, JwtProperties.ACCESS_HEADER_STRING);
         } catch (TokenExpiredException ignored) {
 
         }
-        verifyJwtToken(request, id, JwtProperties.REFRESH_HEADER_STRING);
+        verifyJwtTokenAndAuthority(request, id, JwtProperties.REFRESH_HEADER_STRING);
         String accessToken = request.getHeader(JwtProperties.ACCESS_HEADER_STRING).replace(JwtProperties.TOKEN_PREFIX, "");
         String refreshToken = request.getHeader(JwtProperties.REFRESH_HEADER_STRING).replace(JwtProperties.TOKEN_PREFIX, "");
         sameTokenMemberCheck(accessToken, refreshToken);
-        return generateAccessJwtToken(JWT.decode(accessToken).getClaim("id").asLong(), JWT.decode(accessToken).getSubject().toString());
+        return generateAccessJwtToken(JWT.decode(accessToken).getClaim("id").asLong(), JWT.decode(accessToken).getSubject());
     }
 
-    public static void verifyJwtToken(HttpServletRequest request, Long id, String tokenType) {
-        String jwtToken = request.getHeader(tokenType).replace(JwtProperties.TOKEN_PREFIX, "");
-        DecodedJWT verify = JWT.require(Algorithm.HMAC512(tokenType.equals(JwtProperties.ACCESS_HEADER_STRING) ? JwtProperties.Access_SECRET : JwtProperties.Refresh_SECRET)).build().verify(jwtToken);
-        Long verifyId = verify.getClaim("id").asLong();
+    public static void verifyJwtTokenAndAuthority(HttpServletRequest request, Long id, String tokenType) {
+//        String jwtToken = request.getHeader(tokenType).replace(JwtProperties.TOKEN_PREFIX, "");
+//        DecodedJWT verify = JWT.require(Algorithm.HMAC512(tokenType.equals(JwtProperties.ACCESS_HEADER_STRING) ? JwtProperties.Access_SECRET : JwtProperties.Refresh_SECRET)).build().verify(jwtToken);
+//        Long verifyId = verify.getClaim("id").asLong();
+        Long verifyId = verifyJwtToken(request, tokenType);
         if (!verifyId.equals(id)) {
-            throw new RuntimeException();
+            throw new AuthenticationFailedException(AuthFailed);
         }
     }
 
     public static Long verifyJwtToken(HttpServletRequest request, String tokenType) {
+        CommonCheckUtil.nullCheck404(request.getHeader(tokenType), NoToken);
         String jwtToken = request.getHeader(tokenType).replace(JwtProperties.TOKEN_PREFIX, "");
         DecodedJWT verify = JWT.require(Algorithm.HMAC512(tokenType.equals(JwtProperties.ACCESS_HEADER_STRING) ? JwtProperties.Access_SECRET : JwtProperties.Refresh_SECRET)).build().verify(jwtToken);
         return verify.getClaim("id").asLong();
