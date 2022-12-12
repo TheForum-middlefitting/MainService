@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Date;
 import java.util.Optional;
 
+import static com.practice.springbasic.config.error.ErrorMessage.Forbidden;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -148,9 +149,9 @@ class CommentControllerImplTest {
         ResultActions resultActions = makePutResultActions("/comment-service/boards/1/comments/1", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
+                .andExpect(jsonPath("$.message", equalTo(Forbidden.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
+                .andExpect(jsonPath("$.code", equalTo(Forbidden.split("@")[0])));
     }
 
     @Test
@@ -184,9 +185,9 @@ class CommentControllerImplTest {
         ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
+                .andExpect(jsonPath("$.message", equalTo(Forbidden.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
+                .andExpect(jsonPath("$.code", equalTo(Forbidden.split("@")[0])));
     }
     @Test
     @DisplayName("findCommentPageSuccess")

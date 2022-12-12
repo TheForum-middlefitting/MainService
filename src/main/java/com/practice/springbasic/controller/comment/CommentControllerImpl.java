@@ -15,10 +15,12 @@ import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.comment.CommentService;
 import com.practice.springbasic.service.comment.dto.CommentDto;
 import com.practice.springbasic.service.member.MemberService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,11 +33,14 @@ public class CommentControllerImpl implements CommentController{
     private final BoardService boardService;
     private final MemberService memberService;
     private final CommentService commentService;
+    private final ModelMapper modelMapper;
 
-    public CommentControllerImpl(BoardService boardService, MemberService memberService, CommentService commentService) {
+
+    public CommentControllerImpl(BoardService boardService, MemberService memberService, CommentService commentService, ModelMapper modelMapper) {
         this.boardService = boardService;
         this.memberService = memberService;
         this.commentService = commentService;
+        this.modelMapper = modelMapper;
     }
 
     @Override

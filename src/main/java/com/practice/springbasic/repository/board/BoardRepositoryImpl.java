@@ -74,8 +74,6 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom{
                         boardTitleContains(condition.getBoardTitle()),
                         boardContentContains(condition.getBoardContent()),
                         boardCategoryEq(condition.getBoardCategory()));
-//                .offset(pageable.getPageNumber() * 10L)
-//                .limit(100);
         return PageableExecutionUtils.getPage(content, pageable, countQuery.fetch()::size);
     }
 

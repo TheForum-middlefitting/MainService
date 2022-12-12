@@ -16,7 +16,7 @@ public interface BoardService {
 
     public Optional<Board> findBoard(Long boardId);
 
-    public Board updateBoard(Board board, BoardUpdateDto boardUpdateDto);
+    public Board updateBoard(Board board, BoardDto boardUpdateDto);
 
     public void deleteBoard(Board board);
 

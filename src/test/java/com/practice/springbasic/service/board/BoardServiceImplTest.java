@@ -15,10 +15,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -26,21 +30,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
+@Transactional
 class BoardServiceImplTest {
 
     @Mock
     BoardRepository boardRepository;
 
-    @InjectMocks
+    @Autowired
+    ModelMapper modelMapper;
+//    @InjectMocks
     BoardServiceImpl boardService;
-
-
     private Board board;
     private Member member;
 
     @BeforeEach
     public void initialize() {
-        MockitoAnnotations.openMocks(this);
+//        MockitoAnnotations.openMocks(this);
+        boardService  = new BoardServiceImpl(boardRepository, modelMapper);
     }
 
     @BeforeEach
@@ -83,7 +90,7 @@ class BoardServiceImplTest {
     @Test
     @DisplayName("updateBoardSuccess")
     void updateBoardSuccess() {
-        BoardUpdateDto updateBoardDto = new BoardUpdateDto(BoardCategory.free, "hello world!", "hello world! My name is middlefitting");
+        BoardDto updateBoardDto = new BoardDto(BoardCategory.free, "hello world!", "hello world! My name is middlefitting");
         when(boardRepository.save(any(Board.class))).thenReturn(board);
 
         Board result = boardService.updateBoard(board, updateBoardDto);

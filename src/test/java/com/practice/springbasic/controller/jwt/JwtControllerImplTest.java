@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Date;
 
 import static com.practice.springbasic.config.error.ErrorMessage.AuthFailed;
+import static com.practice.springbasic.config.error.ErrorMessage.TokenExpired;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -74,8 +75,8 @@ class JwtControllerImplTest {
         resultActions
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().doesNotExist("Authorization"))
-                .andExpect(jsonPath("$.code", equalTo("UNAUTHORIZED")))
-                .andExpect(jsonPath("$.message", equalTo("만료된 토큰")))
+                .andExpect(jsonPath("$.code", equalTo(TokenExpired.split("@")[0])))
+                .andExpect(jsonPath("$.message", equalTo(TokenExpired.split("@")[1])))
                 .andExpect(jsonPath("$.status").value(401));
     }
 
