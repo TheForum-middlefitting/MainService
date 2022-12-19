@@ -1,18 +1,24 @@
 package com.practice.springbasic.controller.comment;
 
+import com.practice.springbasic.controller.comment.dto.ReturnSingleCommentForm;
 import com.practice.springbasic.controller.utils.form.SuccessResult;
+import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
+import com.practice.springbasic.repository.comment.dto.CommentPageDto;
 import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
 import com.practice.springbasic.service.comment.dto.CommentDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 public interface CommentController {
-    public SuccessResult postComment(HttpServletRequest request, Long boardId, CommentDto commentDto, BindingResult bindingResult);
-    public SuccessResult getComment(Long boardId, Long commentId);
-    public SuccessResult updateComment(HttpServletRequest request, Long boardId, CommentUpdateDto commentUpdateDto, Long commentId, BindingResult bindingResult);
-    public SuccessResult deleteComment(HttpServletRequest request, Long boardId,  Long commentId);
-    public SuccessResult searchCommentPage(Pageable pageable, Long boardId, CommentPageSearchCondition condition, BindingResult bindingResult);
+    public ResponseEntity<ReturnSingleCommentForm> postComment(HttpServletRequest request, Long boardId, @Valid CommentDto commentDto, BindingResult bindingResult);
+    public  ResponseEntity<ReturnSingleCommentForm> getComment(Long boardId, Long commentId);
+    public ResponseEntity<ReturnSingleCommentForm> updateComment(HttpServletRequest request, Long boardId, @Valid CommentUpdateDto commentUpdateDto, Long commentId, BindingResult bindingResult);
+    public ResponseEntity<SuccessReturnForm> deleteComment(HttpServletRequest request, Long boardId, Long commentId);
+    public ResponseEntity<Page<CommentPageDto>> searchCommentPage(Pageable pageable, Long boardId, @Valid CommentPageSearchCondition condition, BindingResult bindingResult);
 }

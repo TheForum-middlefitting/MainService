@@ -1,11 +1,10 @@
 package com.practice.springbasic.controller.member;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.controller.member.vo.LoginMemberForm;
+import com.practice.springbasic.controller.member.vo.RequestLoginMemberForm;
 import com.practice.springbasic.controller.member.vo.RequestMemberForm;
 import com.practice.springbasic.controller.member.vo.ResponseMemberForm;
-import com.practice.springbasic.controller.utils.check.CheckUtil;
-import com.practice.springbasic.controller.utils.form.SuccessResult;
+import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
 import com.practice.springbasic.service.member.dto.MemberDto;
@@ -58,10 +57,10 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PostMapping("/members/login")
-    public ResponseEntity<ResponseMemberForm> loginMember(HttpServletResponse response, @RequestBody LoginMemberForm loginMemberForm, BindingResult bindingResult) {
+    public ResponseEntity<ResponseMemberForm> loginMember(HttpServletResponse response, @RequestBody RequestLoginMemberForm requestLoginMemberForm, BindingResult bindingResult) {
 //        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
 
-        Member member =  memberService.findMemberByEmailAndPassword(loginMemberForm.getEmail(), loginMemberForm.getPassword()).orElse(null);
+        Member member =  memberService.findMemberByEmailAndPassword(requestLoginMemberForm.getEmail(), requestLoginMemberForm.getPassword()).orElse(null);
         CommonCheckUtil.nullCheck400(member, LoginFailedByWrongInput);
 
         String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
@@ -87,9 +86,9 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PutMapping("members/{memberId}")
-    public ResponseEntity<ResponseMemberForm> updateMember(HttpServletRequest request, @PathVariable Long memberId, @RequestBody @Validated RequestMemberForm requestMemberForm, BindingResult bindingResult) {
+    public ResponseEntity<ResponseMemberForm> updateMember(HttpServletRequest request, @PathVariable Long memberId, @RequestBody RequestMemberForm requestMemberForm, BindingResult bindingResult) {
         //이메일은 바뀌지 말아야 한다.
-        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
+//        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
         JwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
         nicknameDuplicateCheck(requestMemberForm.getNickname());
 
@@ -103,30 +102,29 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @DeleteMapping("members/{memberId}")
-    public SuccessResult deleteMember(HttpServletRequest request, @PathVariable Long memberId, @RequestParam String password) {
+    public ResponseEntity<SuccessReturnForm>  deleteMember(HttpServletRequest request, @PathVariable Long memberId, @RequestParam String password) {
         JwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
 
         memberService.withdrawal(memberId, password);
-
-        return new SuccessResult(null);
+    return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));
     }
 
     @Override
     @GetMapping("/members/nickname-check")
-    public SuccessResult nicknameDuplicateCheck(
+    public ResponseEntity<SuccessReturnForm> nicknameDuplicateCheck(
             @RequestParam("nickname") String nickname) {
         boolean result = memberService.duplicateNickname(nickname);
         CommonCheckUtil.duplicateCheck400(result, DuplicateNickname);
-        return new SuccessResult(null);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));
     }
 
     @Override
     @GetMapping("/members/email-check")
-    public SuccessResult emailDuplicateCheck(
+    public ResponseEntity<SuccessReturnForm> emailDuplicateCheck(
             @RequestParam("email") String email) {
         boolean result = memberService.duplicateEmail(email);
         CommonCheckUtil.duplicateCheck400(result, DuplicateEmail);
-        return new SuccessResult(null);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));
     }
 
     public ResponseMemberForm createResponseMemberForm(Member member) {

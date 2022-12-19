@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.controller.member.vo.LoginMemberForm;
+import com.practice.springbasic.controller.member.vo.RequestLoginMemberForm;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
 import com.practice.springbasic.service.member.dto.MemberDto;
@@ -174,7 +174,7 @@ class MemberControllerImplTest {
     @Test
     public void loginMemberSuccess() throws Exception {
         when(memberService.findMemberByEmailAndPassword(member.getEmail(), member.getPassword())).thenReturn(Optional.ofNullable(member));
-        LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
+        RequestLoginMemberForm loginMemberForm = new RequestLoginMemberForm(member.getEmail(), member.getPassword());
         String content = objectMapper.writeValueAsString(loginMemberForm);
         ResultActions resultActions = makePostResultActions("/member-service/members/login", content);
         resultActions
@@ -196,7 +196,7 @@ class MemberControllerImplTest {
     @Test
     public void loginMemberFailed() throws Exception {
         when(memberService.findMemberByEmailAndPassword(member.getEmail(), member.getPassword())).thenReturn(Optional.empty());
-        LoginMemberForm loginMemberForm = new LoginMemberForm(member.getEmail(), member.getPassword());
+        RequestLoginMemberForm loginMemberForm = new RequestLoginMemberForm(member.getEmail(), member.getPassword());
         String content = objectMapper.writeValueAsString(loginMemberForm);
         ResultActions resultActions = makePostResultActions("/member-service/members/login", content);
 
@@ -314,9 +314,8 @@ class MemberControllerImplTest {
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data", equalTo(null)));
+                .andExpect(jsonPath("$.message", equalTo("요청이 정상적으로 수행되었습니다")))
+                .andExpect(jsonPath("$.status").value(200));
     }
 
     ResultActions makeDeleteResultActions(String url, String jwtToken) throws Exception {

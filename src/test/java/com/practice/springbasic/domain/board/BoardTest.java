@@ -2,6 +2,7 @@ package com.practice.springbasic.domain.board;
 
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
+import com.practice.springbasic.service.board.dto.BoardDto;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,7 +94,7 @@ class BoardTest {
 
     @Test
     public void boardUpdateSuccess() throws Exception{
-        BoardUpdateDto updateDto = new BoardUpdateDto(BoardCategory.total, "middlefitting", "my name is middlefitting");
+        BoardDto updateDto = new BoardDto(BoardCategory.total, "middlefitting", "my name is middlefitting");
         Board           board = Board.builder()
                 .member(this.member)
                 .boardCategory(boardCategory)

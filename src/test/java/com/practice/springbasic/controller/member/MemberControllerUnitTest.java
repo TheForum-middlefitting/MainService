@@ -84,14 +84,4 @@ public class MemberControllerUnitTest {
         CheckUtil.bindingResultCheck(false);
     }
 
-    @Test
-    public void memberNullCheckFailed() throws Exception{
-        assertThrows(IllegalArgumentException.class, () -> {memberController.memberNullCheck(null);});
-    }
-
-    @Test
-    public void memberNullCheckSuccess() throws Exception{
-        memberController.memberNullCheck(member);
-    }
-
 }

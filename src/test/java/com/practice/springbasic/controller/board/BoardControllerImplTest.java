@@ -26,12 +26,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Date;
 import java.util.Optional;
 
+import static com.practice.springbasic.config.error.ErrorMessage.AuthFailed;
+import static com.practice.springbasic.config.error.ErrorMessage.Forbidden;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BoardControllerImpl.class)
 class BoardControllerImplTest {
@@ -77,14 +78,13 @@ class BoardControllerImplTest {
         ResultActions resultActions = makePostResultActions("/board-service/boards", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.boardId", equalTo(null)))
-                .andExpect(jsonPath("$.data.boardCategory").value(boardDto.getBoardCategory().toString()))
-                .andExpect(jsonPath("$.data.title").value(boardDto.getTitle()))
-                .andExpect(jsonPath("$.data.content").value(board.getContent()))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.boardId", equalTo(null)))
+                .andExpect(jsonPath("$.boardCategory").value(boardDto.getBoardCategory().toString()))
+                .andExpect(jsonPath("$.title").value(boardDto.getTitle()))
+                .andExpect(jsonPath("$.content").value(board.getContent()))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
     }
 
     @Test
@@ -95,21 +95,20 @@ class BoardControllerImplTest {
         ResultActions resultActions = makeGetResultActions("/board-service/boards/1");
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.boardId", equalTo(null)))
-                .andExpect(jsonPath("$.data.boardCategory").value(boardDto.getBoardCategory().toString()))
-                .andExpect(jsonPath("$.data.title").value(boardDto.getTitle()))
-                .andExpect(jsonPath("$.data.content").value(board.getContent()))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.boardId", equalTo(null)))
+                .andExpect(jsonPath("$.boardCategory").value(boardDto.getBoardCategory().toString()))
+                .andExpect(jsonPath("$.title").value(boardDto.getTitle()))
+                .andExpect(jsonPath("$.content").value(board.getContent()))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
     }
 
     @Test
     @DisplayName("updateBoardSuccess")
     void updateBoardSuccess() throws Exception{
         when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
-        when(boardService.updateBoard(any(Board.class), any(BoardUpdateDto.class))).thenReturn(updatedBoard);
+        when(boardService.updateBoard(any(Board.class), any(BoardDto.class))).thenReturn(updatedBoard);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
@@ -121,21 +120,20 @@ class BoardControllerImplTest {
         ResultActions resultActions = makePutResultActions("/board-service/boards/1", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.boardId", equalTo(null)))
-                .andExpect(jsonPath("$.data.boardCategory").value(boardUpdateDto.getBoardCategory().toString()))
-                .andExpect(jsonPath("$.data.title").value(boardUpdateDto.getTitle()))
-                .andExpect(jsonPath("$.data.content").value(updatedBoard.getContent()))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.boardId", equalTo(null)))
+                .andExpect(jsonPath("$.boardCategory").value(boardUpdateDto.getBoardCategory().toString()))
+                .andExpect(jsonPath("$.title").value(boardUpdateDto.getTitle()))
+                .andExpect(jsonPath("$.content").value(updatedBoard.getContent()))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
     }
 
     @Test
     @DisplayName("updateBoardFailedByDifferentEmail")
     void updateBoardFailedByDifferentEmail() throws Exception{
         when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
-        when(boardService.updateBoard(any(Board.class), any(BoardUpdateDto.class))).thenReturn(updatedBoard);
+        when(boardService.updateBoard(any(Board.class), any(BoardDto.class))).thenReturn(updatedBoard);
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
@@ -147,9 +145,10 @@ class BoardControllerImplTest {
         ResultActions resultActions = makePutResultActions("/board-service/boards/1", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
-                .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])));
     }
 
     @Test
@@ -165,7 +164,7 @@ class BoardControllerImplTest {
         ResultActions resultActions = makeDeleteResultActions("/board-service/boards/1", jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
+                .andExpect(jsonPath("$.message", equalTo("요청이 정상적으로 수행되었습니다")))
                 .andExpect(jsonPath("$.status").value(200));
     }
 
@@ -182,9 +181,10 @@ class BoardControllerImplTest {
         ResultActions resultActions = makeDeleteResultActions("/board-service/boards/1", jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("경고 정상적이지 않은 접근")))
-                .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo("FORBIDDEN")));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])));
     }
     @Test
     @DisplayName("findBoardPageSuccess")
@@ -200,9 +200,7 @@ class BoardControllerImplTest {
         ResultActions resultActions = makePostResultActions("/board-service/boards/offset/", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data", equalTo(null)));
+                .andExpect(status().isOk());
     }
 
     private Board boardSample(BoardCategory boardCategory, String title, String content, Member member) {
@@ -234,8 +232,8 @@ class BoardControllerImplTest {
                         .header("Authorization", jwtToken)
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                        .accept(MediaType.APPLICATION_JSON));
+//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     ResultActions makeGetResultActions(String url) throws Exception {

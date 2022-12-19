@@ -1,20 +1,21 @@
-package com.practice.springbasic.controller.member.dto;
+package com.practice.springbasic.controller.comment.vo;
 
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NicknameCheckForm {
+public class RequestCommentsForm {
     @NotNull
     @NotEmpty
-    @Length(min=4, max=20)
-    String nickname;
+    @Size( min = 10, max = 1000)
+    private String content;
+
 }

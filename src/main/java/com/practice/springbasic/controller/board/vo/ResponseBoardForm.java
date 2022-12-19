@@ -1,13 +1,18 @@
-package com.practice.springbasic.controller.board.dto;
+package com.practice.springbasic.controller.board.vo;
 
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class ReturnSingleBoardForm {
+//@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@AllArgsConstructor
+public class ResponseBoardForm {
     Long boardId;
     BoardCategory boardCategory;
     String title;
@@ -17,7 +22,7 @@ public class ReturnSingleBoardForm {
     Long memberId;
     LocalDateTime regDate;
 
-    public ReturnSingleBoardForm(Board board) {
+    public ResponseBoardForm(Board board) {
         this.boardId = board.getId();
         this.boardCategory = board.getBoardCategory();
         this.title = board.getTitle();
