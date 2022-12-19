@@ -33,8 +33,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CommentControllerImpl.class)
 class CommentControllerImplTest {
@@ -85,12 +84,11 @@ class CommentControllerImplTest {
         ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.commentId", equalTo(null)))
-                .andExpect(jsonPath("$.data.content").value(comment.getContent()))
-                .andExpect(jsonPath("$.data.nickname").value(comment.getMember().getNickname()))
-                .andExpect(jsonPath("$.data.email").value(comment.getMember().getEmail()));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.commentId", equalTo(null)))
+                .andExpect(jsonPath("$.content").value(comment.getContent()))
+                .andExpect(jsonPath("$.nickname").value(comment.getMember().getNickname()))
+                .andExpect(jsonPath("$.email").value(comment.getMember().getEmail()));
     }
 
     @Test
@@ -101,12 +99,11 @@ class CommentControllerImplTest {
         ResultActions resultActions = makeGetResultActions("/comment-service/boards/1/comments/1");
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.commentId", equalTo(null)))
-                .andExpect(jsonPath("$.data.content").value(comment.getContent()))
-                .andExpect(jsonPath("$.data.nickname").value(comment.getMember().getNickname()))
-                .andExpect(jsonPath("$.data.email").value(comment.getMember().getEmail()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.commentId", equalTo(null)))
+                .andExpect(jsonPath("$.content").value(comment.getContent()))
+                .andExpect(jsonPath("$.nickname").value(comment.getMember().getNickname()))
+                .andExpect(jsonPath("$.email").value(comment.getMember().getEmail()));
     }
 
     @Test
@@ -125,12 +122,10 @@ class CommentControllerImplTest {
         ResultActions resultActions = makePutResultActions("/comment-service/boards/1/comments/1", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data.boardId", equalTo(null)))
-                .andExpect(jsonPath("$.data.content").value(updatedComment.getContent()))
-                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
+                .andExpect(jsonPath("$.boardId", equalTo(null)))
+                .andExpect(jsonPath("$.content").value(updatedComment.getContent()))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                .andExpect(jsonPath("$.email").value(member.getEmail()));
     }
 
     @Test
@@ -167,9 +162,8 @@ class CommentControllerImplTest {
         ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data", equalTo(null)));
+                .andExpect(jsonPath("$.message", equalTo("요청이 정상적으로 수행되었습니다")))
+                .andExpect(jsonPath("$.status").value(200));
     }
 
     @Test
@@ -203,9 +197,7 @@ class CommentControllerImplTest {
         ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments/next/", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo("success")))
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.data", equalTo(null)));
+                .andExpect(status().isOk());
     }
     private Comment commentSample(String content, Member member, Board board) {
         return Comment.builder()
@@ -235,8 +227,8 @@ class CommentControllerImplTest {
                         .header("Authorization", jwtToken)
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                        .accept(MediaType.APPLICATION_JSON));
+//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     ResultActions makeGetResultActions(String url) throws Exception {

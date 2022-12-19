@@ -1,6 +1,7 @@
 package com.practice.springbasic.controller.comment;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
+import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.comment.dto.ReturnSingleCommentForm;
 import com.practice.springbasic.controller.utils.form.SuccessResult;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -45,56 +48,55 @@ public class CommentControllerImpl implements CommentController{
 
     @Override
     @PostMapping("/boards/{boardId}/comments")
-    public SuccessResult postComment(HttpServletRequest request, @PathVariable Long boardId, @RequestBody @Validated CommentDto commentDto, BindingResult bindingResult) {
-        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
+    public ResponseEntity<ReturnSingleCommentForm> postComment(HttpServletRequest request, @PathVariable Long boardId, @RequestBody CommentDto commentDto, BindingResult bindingResult) {
         Long memberId = JwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
         Member member = memberService.findMemberById(memberId).orElse(null);
         Board board = boardService.findBoard(boardId).orElse(null);
         CheckUtil.nullCheck(member);
         CheckUtil.nullCheck(board);
         Comment comment = commentService.postComment(member, board, commentDto);
-        return new SuccessResult(new ReturnSingleCommentForm(comment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ReturnSingleCommentForm(comment));
     }
 
     @Override
     @GetMapping("/boards/{boardId}/comments/{commentId}")
-    public SuccessResult getComment(@PathVariable Long boardId, @PathVariable Long commentId) {
+    public ResponseEntity<ReturnSingleCommentForm> getComment(@PathVariable Long boardId, @PathVariable Long commentId) {
         Comment comment = commentService.findComment(commentId).orElse(null);
         CheckUtil.nullCheck(comment);
-        return new SuccessResult(new ReturnSingleCommentForm(comment));
+        return ResponseEntity.status(HttpStatus.OK).body(new ReturnSingleCommentForm(comment));
     }
 
     @Override
     @PutMapping("/boards/{boardId}/comments/{commentId}")
-    public SuccessResult updateComment(HttpServletRequest request,@PathVariable Long boardId, @RequestBody @Validated CommentUpdateDto commentUpdateDto, @PathVariable Long commentId, BindingResult bindingResult) {
-        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
+    public ResponseEntity<ReturnSingleCommentForm> updateComment(HttpServletRequest request,@PathVariable Long boardId, @RequestBody CommentUpdateDto commentUpdateDto, @PathVariable Long commentId, BindingResult bindingResult) {
         JwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
         String email = JwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
         Comment preComment = commentService.findComment(commentId).orElse(null);
         CheckUtil.nullCheck(preComment);
         memberEmailAndCommentEmailSameCheck(email, preComment);
         Comment comment = commentService.updateComment(preComment, commentUpdateDto);
-        return new SuccessResult(new ReturnSingleCommentForm(comment));
+        return ResponseEntity.status(HttpStatus.OK).body(new ReturnSingleCommentForm(comment));
+
     }
 
     @Override
     @DeleteMapping("/boards/{boardId}/comments/{commentId}")
-    public SuccessResult deleteComment(HttpServletRequest request,@PathVariable Long boardId, @PathVariable Long commentId) {
+    public ResponseEntity<SuccessReturnForm> deleteComment(HttpServletRequest request,@PathVariable Long boardId, @PathVariable Long commentId) {
         JwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
         String email = JwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
         Comment comment = commentService.findComment(commentId).orElse(null);
         CheckUtil.nullCheck(comment);
         memberEmailAndCommentEmailSameCheck(email, comment);
         commentService.deleteComment(comment);
-        return new SuccessResult(null);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));
+//        return new SuccessResult(null);
     }
     @Override
     @PostMapping("/boards/{boardId}/comments/next/")
-    public SuccessResult searchCommentPage(@PageableDefault(page = 0, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<Page<CommentPageDto>> searchCommentPage(@PageableDefault(page = 0, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
                                            @PathVariable Long boardId, @RequestBody @Validated CommentPageSearchCondition condition, BindingResult bindingResult) {
-        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
         Page<CommentPageDto> commentPage = commentService.findCommentPage(pageable, condition, boardId);
-        return new SuccessResult(commentPage);
+        return ResponseEntity.status(HttpStatus.OK).body(commentPage);
     }
     private static void memberEmailAndCommentEmailSameCheck(String email, Comment comment) {
         if(!email.equals(comment.getMember().getEmail())) {
