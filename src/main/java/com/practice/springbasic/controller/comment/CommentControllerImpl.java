@@ -4,7 +4,6 @@ import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.comment.dto.ReturnSingleCommentForm;
-import com.practice.springbasic.controller.utils.form.SuccessResult;
 import com.practice.springbasic.controller.utils.check.CheckUtil;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.comment.Comment;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -89,7 +87,6 @@ public class CommentControllerImpl implements CommentController{
         memberEmailAndCommentEmailSameCheck(email, comment);
         commentService.deleteComment(comment);
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));
-//        return new SuccessResult(null);
     }
     @Override
     @PostMapping("/boards/{boardId}/comments/next/")
