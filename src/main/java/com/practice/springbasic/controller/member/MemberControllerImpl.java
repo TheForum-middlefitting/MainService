@@ -38,7 +38,6 @@ public class MemberControllerImpl implements MemberController{
     @Override
     @PostMapping("/members")
     public ResponseEntity<ResponseMemberForm> joinMember(HttpServletResponse response, @RequestBody RequestMemberForm requestUserForm, BindingResult bindingResult) {
-//        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
         emailDuplicateCheck(requestUserForm.getEmail());
         nicknameDuplicateCheck(requestUserForm.getNickname());
         MemberDto memberDto = modelMapper.map(requestUserForm, MemberDto.class);
