@@ -14,6 +14,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         //모든 요청 허용
         http.authorizeRequests().antMatchers("/**").permitAll();
+//        http.authorizeRequests()//.antMatchers("/error/**").permitAll()
+//        .antMatchers("/**")
+//        .access("hasIpAddress('" + "192.168.0.62" + "')");
+
         //프레임옵션 제거하여 h2 나누어지는 것 무시
         http.headers().frameOptions().disable();
 
