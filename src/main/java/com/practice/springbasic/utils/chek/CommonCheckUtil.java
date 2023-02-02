@@ -22,4 +22,8 @@ public class CommonCheckUtil {
             throw new AuthenticationFailedException(msg);
         }
     }
+
+    public static void booleanCheck400(boolean checkValue, String msg) {
+        if(!checkValue) {throw new IllegalArgumentException(msg);}
+    }
 }

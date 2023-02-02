@@ -92,9 +92,9 @@ public class MemberControllerImpl implements MemberController{
         JwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
         nicknameDuplicateCheck(requestMemberForm.getNickname());
 
+        MemberDto memberUpdateDto = modelMapper.map(requestMemberForm, MemberDto.class);
         Member member = memberService.findMemberByEmailAndPassword(requestMemberForm.getEmail(), requestMemberForm.getPassword()).orElse(null);
         CommonCheckUtil.nullCheck400(member, LoginFailedByWrongInput);
-        MemberDto memberUpdateDto = modelMapper.map(requestMemberForm, MemberDto.class);
         memberService.update(member, memberUpdateDto);
         ResponseMemberForm responseMemberForm = createResponseMemberForm(member);
         return ResponseEntity.status(HttpStatus.OK).body(responseMemberForm);
