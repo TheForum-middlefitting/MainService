@@ -8,7 +8,8 @@ import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
 import com.practice.springbasic.service.member.dto.MemberDto;
-import com.practice.springbasic.utils.chek.CommonCheckUtil;
+import com.practice.springbasic.utils.cheak.CommonCheckUtil;
+import com.practice.springbasic.utils.error.errorCode.ErrorCode;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,7 @@ public class MemberControllerImpl implements MemberController{
 
         Member member =  memberService.findMemberByEmailAndPassword(requestLoginMemberForm.getEmail(), requestLoginMemberForm.getPassword()).orElse(null);
         CommonCheckUtil.nullCheck400(member, LoginFailedByWrongInput);
+//        CommonCheckUtil.nullCheck400(member, ErrorCode.LoginFailedByWrongInput.toString());
 
         String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
         String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());

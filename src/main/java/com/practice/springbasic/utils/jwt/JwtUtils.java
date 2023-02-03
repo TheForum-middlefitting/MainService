@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.utils.chek.CommonCheckUtil;
+import com.practice.springbasic.utils.cheak.CommonCheckUtil;
 import com.practice.springbasic.utils.error.exception.AuthenticationFailedException;
 
 import javax.servlet.http.HttpServletRequest;

@@ -1,8 +1,5 @@
-package com.practice.springbasic.utils.chek;
+package com.practice.springbasic.utils.cheak;
 import com.practice.springbasic.utils.error.exception.AuthenticationFailedException;
-
-import javax.naming.AuthenticationException;
-import java.util.Arrays;
 
 public class CommonCheckUtil {
     public static void nullCheck400(Object checkValue, String msg) {
