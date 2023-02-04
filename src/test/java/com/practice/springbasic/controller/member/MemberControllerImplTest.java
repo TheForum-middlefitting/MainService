@@ -292,7 +292,7 @@ class MemberControllerImplTest {
     public void nicknameDuplicateFalse() throws Exception {
         when(memberService.duplicateNickname(ArgumentMatchers.any())).thenReturn(true);
 
-        ResultActions resultActions = makeGetResultActions("/member-service/members/nickname-check?nickname=middle");
+        ResultActions resultActions = makeGetResultActions("/member-service/nickname-check?nickname=middle");
 
         resultActions
                 .andExpect(status().isBadRequest())

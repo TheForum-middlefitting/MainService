@@ -11,7 +11,7 @@ import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.board.dto.BoardDto;
 import com.practice.springbasic.service.member.MemberService;
-import com.practice.springbasic.utils.chek.CommonCheckUtil;
+import com.practice.springbasic.utils.cheak.CommonCheckUtil;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;

@@ -8,7 +8,8 @@ import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
 import com.practice.springbasic.service.member.dto.MemberDto;
-import com.practice.springbasic.utils.chek.CommonCheckUtil;
+import com.practice.springbasic.utils.cheak.CommonCheckUtil;
+import com.practice.springbasic.utils.error.errorCode.ErrorCode;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,6 @@ public class MemberControllerImpl implements MemberController{
     @Override
     @PostMapping("/members")
     public ResponseEntity<ResponseMemberForm> joinMember(HttpServletResponse response, @RequestBody RequestMemberForm requestUserForm, BindingResult bindingResult) {
-//        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
         emailDuplicateCheck(requestUserForm.getEmail());
         nicknameDuplicateCheck(requestUserForm.getNickname());
         MemberDto memberDto = modelMapper.map(requestUserForm, MemberDto.class);
@@ -62,6 +62,7 @@ public class MemberControllerImpl implements MemberController{
 
         Member member =  memberService.findMemberByEmailAndPassword(requestLoginMemberForm.getEmail(), requestLoginMemberForm.getPassword()).orElse(null);
         CommonCheckUtil.nullCheck400(member, LoginFailedByWrongInput);
+//        CommonCheckUtil.nullCheck400(member, ErrorCode.LoginFailedByWrongInput.toString());
 
         String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
         String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
@@ -110,7 +111,7 @@ public class MemberControllerImpl implements MemberController{
     }
 
     @Override
-    @GetMapping("/members/nickname-check")
+    @GetMapping("/nickname-check")
     public ResponseEntity<SuccessReturnForm> nicknameDuplicateCheck(
             @RequestParam("nickname") String nickname) {
         boolean result = memberService.duplicateNickname(nickname);
@@ -119,7 +120,7 @@ public class MemberControllerImpl implements MemberController{
     }
 
     @Override
-    @GetMapping("/members/email-check")
+    @GetMapping("/email-check")
     public ResponseEntity<SuccessReturnForm> emailDuplicateCheck(
             @RequestParam("email") String email) {
         boolean result = memberService.duplicateEmail(email);
