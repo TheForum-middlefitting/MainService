@@ -1,7 +1,6 @@
 package com.practice.springbasic.utils.error.errorCode;
 
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
 //@ToString

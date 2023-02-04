@@ -111,7 +111,7 @@ public class MemberControllerImpl implements MemberController{
     }
 
     @Override
-    @GetMapping("/members/nickname-check")
+    @GetMapping("/nickname-check")
     public ResponseEntity<SuccessReturnForm> nicknameDuplicateCheck(
             @RequestParam("nickname") String nickname) {
         boolean result = memberService.duplicateNickname(nickname);
@@ -120,7 +120,7 @@ public class MemberControllerImpl implements MemberController{
     }
 
     @Override
-    @GetMapping("/members/email-check")
+    @GetMapping("/email-check")
     public ResponseEntity<SuccessReturnForm> emailDuplicateCheck(
             @RequestParam("email") String email) {
         boolean result = memberService.duplicateEmail(email);
