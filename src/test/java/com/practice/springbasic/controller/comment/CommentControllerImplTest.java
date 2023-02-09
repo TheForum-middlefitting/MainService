@@ -9,7 +9,6 @@ import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.comment.CommentService;
@@ -21,14 +20,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
-import static com.practice.springbasic.config.error.ErrorMessage.Forbidden;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -50,11 +50,13 @@ class CommentControllerImplTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    Environment env;
+
     private Member member;
     private Board board;
     private Comment comment;
     private CommentDto commentDto;
-
     private CommentUpdateDto commentUpdateDto;
     private Comment updatedComment;
 
@@ -89,6 +91,30 @@ class CommentControllerImplTest {
                 .andExpect(jsonPath("$.content").value(comment.getContent()))
                 .andExpect(jsonPath("$.nickname").value(comment.getMember().getNickname()))
                 .andExpect(jsonPath("$.email").value(comment.getMember().getEmail()));
+    }
+
+    @Test
+    @DisplayName("postCommentFailedByContentLen")
+    void postCommentFailedByContentLen() throws Exception {
+        String content = objectMapper.writeValueAsString(new CommentDto("hello"));
+        ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, "");
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(env.getProperty("CommentContentLen.code")))
+                .andExpect(jsonPath("$.message").value(env.getProperty("CommentContentLen.msg")))
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    @DisplayName("postCommentFailedByContentEmpty")
+    void postCommentFailedByContentEmpty() throws Exception {
+        String content = objectMapper.writeValueAsString(new CommentDto(""));
+        ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, "");
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(env.getProperty("CommentContentEmpty.code")))
+                .andExpect(jsonPath("$.message").value(env.getProperty("CommentContentEmpty.msg")))
+                .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
@@ -144,9 +170,9 @@ class CommentControllerImplTest {
         ResultActions resultActions = makePutResultActions("/comment-service/boards/1/comments/1", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo(Forbidden.split("@")[1])))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("Forbidden.msg"))))))
                 .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo(Forbidden.split("@")[0])));
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("Forbidden.code"))))));
     }
 
     @Test
@@ -179,9 +205,9 @@ class CommentControllerImplTest {
         ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo(Forbidden.split("@")[1])))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("Forbidden.msg"))))))
                 .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo(Forbidden.split("@")[0])));
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("Forbidden.code"))))));
     }
     @Test
     @DisplayName("findCommentPageSuccess")

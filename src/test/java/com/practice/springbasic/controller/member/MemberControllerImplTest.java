@@ -16,14 +16,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
-import static com.practice.springbasic.config.error.ErrorMessage.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,6 +39,9 @@ class MemberControllerImplTest {
     MockMvc mockMvc;
     @MockBean
     MemberService memberService;
+
+    @Autowired
+    Environment env;
 
     @Autowired
     ModelMapper modelMapper;
@@ -82,13 +86,6 @@ class MemberControllerImplTest {
                 .andExpect(jsonPath("$.memberId", equalTo(null)))
                 .andExpect(jsonPath("$.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.email").value(member.getEmail()));
-//                .andExpect(jsonPath("$.message", equalTo("success")))
-//                .andExpect(jsonPath("$.status").value(201))
-//                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
-//                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
-//                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-//                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
-//                .andDo(print());
     }
 
     @Test
@@ -101,8 +98,8 @@ class MemberControllerImplTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo(EmailForm.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(EmailForm.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("EmailForm.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("EmailForm.msg"))))))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
@@ -117,8 +114,8 @@ class MemberControllerImplTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo(NicknameLen.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(NicknameLen.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("NicknameLen.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("NicknameLen.msg"))))))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
@@ -133,8 +130,8 @@ class MemberControllerImplTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo(PasswordLen.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(PasswordLen.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("PasswordLen.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("PasswordLen.msg"))))))
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(print());
     }
@@ -150,8 +147,8 @@ class MemberControllerImplTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo(DuplicateEmail.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(DuplicateEmail.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("DuplicateEmail.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("DuplicateEmail.msg"))))))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
@@ -166,8 +163,8 @@ class MemberControllerImplTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(header().doesNotExist("Authorization"))
                 .andExpect(header().doesNotExist("Refresh"))
-                .andExpect(jsonPath("$.code", equalTo(DuplicateNickname.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(DuplicateNickname.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("DuplicateNickname.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("DuplicateNickname.msg"))))))
                 .andExpect(jsonPath("$.status").value(400));
     }
 
@@ -185,12 +182,6 @@ class MemberControllerImplTest {
                 .andExpect(jsonPath("$.memberId", equalTo(null)))
                 .andExpect(jsonPath("$.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.email").value(member.getEmail()));
-//                .andExpect(jsonPath("$.message", equalTo("success")))
-//                .andExpect(jsonPath("$.status").value(200))
-//                .andExpect(jsonPath("$.data.memberId").value(member.getId()))
-//                .andExpect(jsonPath("$.data.memberId", equalTo(null)))
-//                .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
-//                .andExpect(jsonPath("$.data.email").value(member.getEmail()));
     }
 
     @Test
@@ -241,8 +232,8 @@ class MemberControllerImplTest {
 
         resultActions
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])))
-                .andExpect(jsonPath("$.message").value(AuthFailed.split("@")[1]))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.code"))))))
+                .andExpect(jsonPath("$.message").value(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.msg")))))
                 .andExpect(jsonPath("$.status").value(401));
     }
 
@@ -260,8 +251,8 @@ class MemberControllerImplTest {
 
         resultActions
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code", equalTo(MemberNotFound.split("@")[0])))
-                .andExpect(jsonPath("$.message").value(MemberNotFound.split("@")[1]))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("MemberNotFound.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("MemberNotFound.msg"))))))
                 .andExpect(jsonPath("$.status").value(404));
     }
 
@@ -296,8 +287,8 @@ class MemberControllerImplTest {
 
         resultActions
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", equalTo(DuplicateNickname.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(DuplicateNickname.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("DuplicateNickname.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("DuplicateNickname.msg"))))))
                 .andExpect(jsonPath("$.status").value(400));
     }
 

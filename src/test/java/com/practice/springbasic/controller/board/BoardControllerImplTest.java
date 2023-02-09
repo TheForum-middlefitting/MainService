@@ -19,15 +19,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
-import static com.practice.springbasic.config.error.ErrorMessage.AuthFailed;
-import static com.practice.springbasic.config.error.ErrorMessage.Forbidden;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -53,6 +53,9 @@ class BoardControllerImplTest {
 
     private BoardUpdateDto boardUpdateDto;
     private Board updatedBoard;
+
+    @Autowired
+    private Environment env;
 
     @BeforeEach
     public void createBoard() {
@@ -146,9 +149,9 @@ class BoardControllerImplTest {
 
         resultActions
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.msg"))))))
                 .andExpect(jsonPath("$.status").value(401))
-                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])));
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.code"))))));
     }
 
     @Test
@@ -182,9 +185,9 @@ class BoardControllerImplTest {
 
         resultActions
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.msg"))))))
                 .andExpect(jsonPath("$.status").value(401))
-                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])));
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.code"))))));
     }
     @Test
     @DisplayName("findBoardPageSuccess")

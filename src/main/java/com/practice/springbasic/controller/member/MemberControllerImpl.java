@@ -8,8 +8,7 @@ import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
 import com.practice.springbasic.service.member.dto.MemberDto;
-import com.practice.springbasic.utils.cheak.CommonCheckUtil;
-import com.practice.springbasic.utils.error.errorCode.ErrorCode;
+import com.practice.springbasic.utils.check.CommonCheckUtil;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import static com.practice.springbasic.config.error.ErrorMessage.*;
 
 @RestController
 @RequestMapping("/member-service")
@@ -61,7 +58,7 @@ public class MemberControllerImpl implements MemberController{
 //        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
 
         Member member =  memberService.findMemberByEmailAndPassword(requestLoginMemberForm.getEmail(), requestLoginMemberForm.getPassword()).orElse(null);
-        CommonCheckUtil.nullCheck400(member, LoginFailedByWrongInput);
+        CommonCheckUtil.nullCheck400(member, "LoginFailedByWrongInput");
 //        CommonCheckUtil.nullCheck400(member, ErrorCode.LoginFailedByWrongInput.toString());
 
         String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
@@ -80,7 +77,7 @@ public class MemberControllerImpl implements MemberController{
 
         Member member = memberService.findMemberById(memberId).orElse(null);
 
-        CommonCheckUtil.nullCheck404(member, MemberNotFound);
+        CommonCheckUtil.nullCheck404(member, "MemberNotFound");
         ResponseMemberForm responseMemberForm = createResponseMemberForm(member);
         return ResponseEntity.status(HttpStatus.OK).body(responseMemberForm);
     }
@@ -95,7 +92,7 @@ public class MemberControllerImpl implements MemberController{
 
         MemberDto memberUpdateDto = modelMapper.map(requestMemberForm, MemberDto.class);
         Member member = memberService.findMemberByEmailAndPassword(requestMemberForm.getEmail(), requestMemberForm.getPassword()).orElse(null);
-        CommonCheckUtil.nullCheck400(member, LoginFailedByWrongInput);
+        CommonCheckUtil.nullCheck400(member, "LoginFailedByWrongInput");
         memberService.update(member, memberUpdateDto);
         ResponseMemberForm responseMemberForm = createResponseMemberForm(member);
         return ResponseEntity.status(HttpStatus.OK).body(responseMemberForm);
@@ -115,7 +112,7 @@ public class MemberControllerImpl implements MemberController{
     public ResponseEntity<SuccessReturnForm> nicknameDuplicateCheck(
             @RequestParam("nickname") String nickname) {
         boolean result = memberService.duplicateNickname(nickname);
-        CommonCheckUtil.duplicateCheck400(result, DuplicateNickname);
+        CommonCheckUtil.duplicateCheck400(result, "DuplicateNickname");
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));
     }
 
@@ -124,7 +121,7 @@ public class MemberControllerImpl implements MemberController{
     public ResponseEntity<SuccessReturnForm> emailDuplicateCheck(
             @RequestParam("email") String email) {
         boolean result = memberService.duplicateEmail(email);
-        CommonCheckUtil.duplicateCheck400(result, DuplicateEmail);
+        CommonCheckUtil.duplicateCheck400(result, "DuplicateEmail");
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));
     }
 

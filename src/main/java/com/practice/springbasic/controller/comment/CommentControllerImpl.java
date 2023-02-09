@@ -1,10 +1,9 @@
 package com.practice.springbasic.controller.comment;
 
 import com.practice.springbasic.config.jwt.JwtProperties;
-import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
-import com.practice.springbasic.utils.jwt.JwtUtils;
 import com.practice.springbasic.controller.comment.dto.ReturnSingleCommentForm;
 import com.practice.springbasic.controller.utils.check.CheckUtil;
+import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
@@ -15,6 +14,7 @@ import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.comment.CommentService;
 import com.practice.springbasic.service.comment.dto.CommentDto;
 import com.practice.springbasic.service.member.MemberService;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/comment-service")
+@Validated
 public class CommentControllerImpl implements CommentController{
     private final BoardService boardService;
     private final MemberService memberService;

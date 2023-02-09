@@ -7,14 +7,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Date;
+import java.util.Objects;
 
-import static com.practice.springbasic.config.error.ErrorMessage.AuthFailed;
-import static com.practice.springbasic.config.error.ErrorMessage.TokenExpired;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -24,6 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class JwtControllerImplTest {
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    Environment env;
     String accessToken;
     String refreshToken;
     String accessToken2;
@@ -75,8 +78,8 @@ class JwtControllerImplTest {
         resultActions
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().doesNotExist("Authorization"))
-                .andExpect(jsonPath("$.code", equalTo(TokenExpired.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(TokenExpired.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("TokenExpired.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("TokenExpired.msg"))))))
                 .andExpect(jsonPath("$.status").value(401));
     }
 
@@ -86,8 +89,8 @@ class JwtControllerImplTest {
         resultActions
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().doesNotExist("Authorization"))
-                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.msg"))))))
                 .andExpect(jsonPath("$.status").value(401));
     }
 

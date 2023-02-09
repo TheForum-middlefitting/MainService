@@ -1,8 +1,10 @@
 server:
-  port: 0
+  port: 1111
 spring:
   application:
     name: member-service
+  profiles:
+    include: env
   h2:
     console:
       enabled: true
@@ -22,7 +24,7 @@ spring:
     url: jdbc:h2:mem:memberService
 
 eureka:
-  inst ance:
+  instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
   client:
     register-with-eureka: true
@@ -30,5 +32,8 @@ eureka:
     service-url:
       defaultZone: http://127.0.0.1:8761/eureka
 
-greeting:
-  message: Welcome to the Member Service!
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh
