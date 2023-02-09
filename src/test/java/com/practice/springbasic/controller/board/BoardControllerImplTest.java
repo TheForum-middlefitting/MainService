@@ -13,6 +13,7 @@ import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.board.dto.BoardDto;
 import com.practice.springbasic.service.member.MemberService;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,9 @@ class BoardControllerImplTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    JwtUtils jwtUtils;
 
     private Member member;
     private Board board;

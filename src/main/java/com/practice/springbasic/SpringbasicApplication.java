@@ -1,5 +1,6 @@
 package com.practice.springbasic;
 
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
@@ -28,6 +29,11 @@ public class SpringbasicApplication {
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public JwtUtils jwtUtils() {
+		return new JwtUtils();
 	}
 
 //	@Bean

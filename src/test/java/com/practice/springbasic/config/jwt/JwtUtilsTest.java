@@ -2,15 +2,18 @@ package com.practice.springbasic.config.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Date;
 
-import static com.practice.springbasic.utils.jwt.JwtUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class JwtUtilsTest {
     String accessToken;
     String refreshToken;
@@ -18,6 +21,8 @@ class JwtUtilsTest {
     String refreshToken2;
     String secretFailToken;
     String expireToken;
+    @Autowired
+    JwtUtils jwtUtils;
 
     //.withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
     @BeforeEach
@@ -37,7 +42,7 @@ class JwtUtilsTest {
         Long id = 1L;
         String email = "middlefitting@gmaail.com";
 
-        String refreshToken = generateRefreshJwtToken(1L, "middlefitting@gmaail.com");
+        String refreshToken = jwtUtils.generateRefreshJwtToken(1L, "middlefitting@gmaail.com");
 
         assertThat(JWT.decode(refreshToken).getClaim("id").asLong()).isEqualTo(id);
         assertThat(JWT.decode(refreshToken).getSubject().toString()).isEqualTo(email);
@@ -48,7 +53,7 @@ class JwtUtilsTest {
         Long id = 1L;
         String email = "middlefitting@gmaail.com";
 
-        String refreshToken = generateAccessJwtToken(1L, "middlefitting@gmaail.com");
+        String refreshToken = jwtUtils.generateAccessJwtToken(1L, "middlefitting@gmaail.com");
 
         assertThat(JWT.decode(refreshToken).getClaim("id").asLong()).isEqualTo(id);
         assertThat(JWT.decode(refreshToken).getSubject().toString()).isEqualTo(email);
@@ -56,14 +61,14 @@ class JwtUtilsTest {
 
     @Test
     public void sameTokenCheckSuccess() throws Exception{
-        sameTokenMemberCheck(accessToken, refreshToken);
-        sameTokenMemberCheck(accessToken2, refreshToken2);
+        jwtUtils.sameTokenMemberCheck(accessToken, refreshToken);
+        jwtUtils.sameTokenMemberCheck(accessToken2, refreshToken2);
     }
 
     @Test
     public void sameTokenCheckFailed() throws Exception{
-        assertThrows(RuntimeException.class, () -> {sameTokenMemberCheck(accessToken, accessToken2);});
-        assertThrows(RuntimeException.class, () -> {sameTokenMemberCheck(accessToken2, accessToken);});
+        assertThrows(RuntimeException.class, () -> {jwtUtils.sameTokenMemberCheck(accessToken, accessToken2);});
+        assertThrows(RuntimeException.class, () -> {jwtUtils.sameTokenMemberCheck(accessToken2, accessToken);});
     }
 
     public String tokenExample(String email, Long id, String secret, Date date) {

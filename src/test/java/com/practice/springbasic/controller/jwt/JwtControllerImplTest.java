@@ -3,6 +3,7 @@ package com.practice.springbasic.controller.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.practice.springbasic.config.jwt.JwtProperties;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ class JwtControllerImplTest {
 
     @Autowired
     Environment env;
+
+    @Autowired
+    JwtUtils jwtUtils;
     String accessToken;
     String refreshToken;
     String accessToken2;

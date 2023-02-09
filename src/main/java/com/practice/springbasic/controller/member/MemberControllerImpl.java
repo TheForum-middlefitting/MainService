@@ -27,10 +27,12 @@ public class MemberControllerImpl implements MemberController{
 
     private final MemberService memberService;
     private final ModelMapper modelMapper;
+    private final JwtUtils jwtUtils;
 
-    public MemberControllerImpl(MemberService memberService, ModelMapper modelMapper) {
+    public MemberControllerImpl(MemberService memberService, ModelMapper modelMapper, JwtUtils jwtUtils) {
         this.memberService = memberService;
         this.modelMapper = modelMapper;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -42,8 +44,8 @@ public class MemberControllerImpl implements MemberController{
 
         Member member = memberService.join(memberDto);
 
-        String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
-        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
+        String accessJwtToken = jwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
+        String refreshJwtToken = jwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
         response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
         response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
 
@@ -61,8 +63,8 @@ public class MemberControllerImpl implements MemberController{
         CommonCheckUtil.nullCheck400(member, "LoginFailedByWrongInput");
 //        CommonCheckUtil.nullCheck400(member, ErrorCode.LoginFailedByWrongInput.toString());
 
-        String accessJwtToken = JwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
-        String refreshJwtToken = JwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
+        String accessJwtToken = jwtUtils.generateAccessJwtToken(member.getId(), member.getEmail());
+        String refreshJwtToken = jwtUtils.generateRefreshJwtToken(member.getId(), member.getEmail());
         response.addHeader(JwtProperties.ACCESS_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessJwtToken);
         response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshJwtToken);
 
@@ -73,7 +75,7 @@ public class MemberControllerImpl implements MemberController{
     @Override
     @GetMapping("members/{memberId}")
     public ResponseEntity<ResponseMemberForm> getMember(HttpServletRequest request, @PathVariable Long memberId) {
-        JwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
 
         Member member = memberService.findMemberById(memberId).orElse(null);
 
@@ -87,7 +89,7 @@ public class MemberControllerImpl implements MemberController{
     public ResponseEntity<ResponseMemberForm> updateMember(HttpServletRequest request, @PathVariable Long memberId, @RequestBody RequestMemberForm requestMemberForm, BindingResult bindingResult) {
         //이메일은 바뀌지 말아야 한다.
 //        CheckUtil.bindingResultCheck(bindingResult.hasErrors());
-        JwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
         nicknameDuplicateCheck(requestMemberForm.getNickname());
 
         MemberDto memberUpdateDto = modelMapper.map(requestMemberForm, MemberDto.class);
@@ -101,7 +103,7 @@ public class MemberControllerImpl implements MemberController{
     @Override
     @DeleteMapping("members/{memberId}")
     public ResponseEntity<SuccessReturnForm>  deleteMember(HttpServletRequest request, @PathVariable Long memberId, @RequestParam String password) {
-        JwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtTokenAndAuthority(request, memberId, JwtProperties.ACCESS_HEADER_STRING);
 
         memberService.withdrawal(memberId, password);
     return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));

@@ -14,6 +14,7 @@ import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.comment.CommentService;
 import com.practice.springbasic.service.comment.dto.CommentDto;
 import com.practice.springbasic.service.member.MemberService;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,9 @@ class CommentControllerImplTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    JwtUtils jwtUtils;
 
     @Autowired
     Environment env;
@@ -108,7 +112,7 @@ class CommentControllerImplTest {
     @Test
     @DisplayName("postCommentFailedByContentEmpty")
     void postCommentFailedByContentEmpty() throws Exception {
-        String content = objectMapper.writeValueAsString(new CommentDto(""));
+        String content = objectMapper.writeValueAsString(new CommentDto(null));
         ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, "");
         resultActions
                 .andExpect(status().isBadRequest())

@@ -8,6 +8,7 @@ import com.practice.springbasic.controller.member.vo.RequestLoginMemberForm;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
 import com.practice.springbasic.service.member.dto.MemberDto;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -46,6 +47,9 @@ class MemberControllerImplTest {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
     MemberControllerImpl memberController;
     //편한데 오래된 방식이라 나온다 
     //LinkedMultiValueMap<String, String> 를 통해 추후 변경
@@ -60,7 +64,7 @@ class MemberControllerImplTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        memberController = new MemberControllerImpl(memberService, modelMapper);
+        memberController = new MemberControllerImpl(memberService, modelMapper, jwtUtils);
     }
     @BeforeEach
     public void createMember() {

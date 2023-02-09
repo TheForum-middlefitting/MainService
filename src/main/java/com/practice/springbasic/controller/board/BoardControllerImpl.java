@@ -36,12 +36,14 @@ public class BoardControllerImpl implements BoardController{
     private final MemberService memberService;
     private final ModelMapper modelMapper;
     private final Environment env;
+    private final JwtUtils jwtUtils;
 
-    public BoardControllerImpl(BoardService boardService, MemberService memberService, ModelMapper modelMapper, Environment env) {
+    public BoardControllerImpl(BoardService boardService, MemberService memberService, ModelMapper modelMapper, Environment env, JwtUtils jwtUtils) {
         this.boardService = boardService;
         this.memberService = memberService;
         this.modelMapper = modelMapper;
         this.env = env;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class BoardControllerImpl implements BoardController{
             @RequestBody RequestBoardForm boardForm,
             BindingResult bindingResult
             ) {
-        Long memberId = JwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
+        Long memberId = jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
         Member member = memberService.findMemberById(memberId).orElse(null);
         CommonCheckUtil.nullCheck400(member, "AuthFailed");
         BoardDto boardDto = modelMapper.map(boardForm, BoardDto.class);
@@ -76,8 +78,8 @@ public class BoardControllerImpl implements BoardController{
              @PathVariable Long boardId,
              BindingResult bindingResult
             ) {
-        JwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
-        String email = JwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
+        String email = jwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
         Board board = boardService.findBoard(boardId).orElse(null);
         CommonCheckUtil.nullCheck404(board, "BoardNotFound");
         CommonCheckUtil.equalCheck401(email, board.getMember().getEmail(), "AuthFailed");
@@ -89,8 +91,8 @@ public class BoardControllerImpl implements BoardController{
     @Override
     @DeleteMapping("boards/{boardId}")
     public ResponseEntity<SuccessReturnForm> deleteBoard(HttpServletRequest request, @PathVariable Long boardId) {
-        JwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
-        String email = JwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
+        String email = jwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
         Board board = boardService.findBoard(boardId).orElse(null);
         CommonCheckUtil.nullCheck404(board, "BoardNotFound");
         CommonCheckUtil.equalCheck401(email, board.getMember().getEmail(), "AuthFailed");
