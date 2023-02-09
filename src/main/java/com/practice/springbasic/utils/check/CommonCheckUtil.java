@@ -1,4 +1,4 @@
-package com.practice.springbasic.utils.cheak;
+package com.practice.springbasic.utils.check;
 import com.practice.springbasic.utils.error.exception.AuthenticationFailedException;
 
 public class CommonCheckUtil {

@@ -3,7 +3,6 @@ package com.practice.springbasic.controller.board;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
@@ -13,21 +12,22 @@ import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.board.dto.BoardDto;
 import com.practice.springbasic.service.member.MemberService;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
-import static com.practice.springbasic.config.error.ErrorMessage.AuthFailed;
-import static com.practice.springbasic.config.error.ErrorMessage.Forbidden;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -47,12 +47,18 @@ class BoardControllerImplTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
     private Member member;
     private Board board;
     private BoardDto boardDto;
 
     private BoardUpdateDto boardUpdateDto;
     private Board updatedBoard;
+
+    @Autowired
+    private Environment env;
 
     @BeforeEach
     public void createBoard() {
@@ -70,9 +76,9 @@ class BoardControllerImplTest {
         when(boardService.postBoard(any(Member.class), any(BoardDto.class))).thenReturn(board);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
         String content = objectMapper.writeValueAsString(boardDto);
 
         ResultActions resultActions = makePostResultActions("/board-service/boards", content, jwtToken);
@@ -111,9 +117,9 @@ class BoardControllerImplTest {
         when(boardService.updateBoard(any(Board.class), any(BoardDto.class))).thenReturn(updatedBoard);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         String content = objectMapper.writeValueAsString(boardDto);
 
@@ -136,9 +142,9 @@ class BoardControllerImplTest {
         when(boardService.updateBoard(any(Board.class), any(BoardDto.class))).thenReturn(updatedBoard);
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         String content = objectMapper.writeValueAsString(boardDto);
 
@@ -146,9 +152,9 @@ class BoardControllerImplTest {
 
         resultActions
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.msg"))))))
                 .andExpect(jsonPath("$.status").value(401))
-                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])));
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.code"))))));
     }
 
     @Test
@@ -157,9 +163,9 @@ class BoardControllerImplTest {
         when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeDeleteResultActions("/board-service/boards/1", jwtToken);
 
@@ -174,17 +180,17 @@ class BoardControllerImplTest {
         when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeDeleteResultActions("/board-service/boards/1", jwtToken);
 
         resultActions
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.msg"))))))
                 .andExpect(jsonPath("$.status").value(401))
-                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])));
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.code"))))));
     }
     @Test
     @DisplayName("findBoardPageSuccess")
@@ -193,9 +199,9 @@ class BoardControllerImplTest {
         String content = objectMapper.writeValueAsString(condition);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makePostResultActions("/board-service/boards/offset/", content, jwtToken);
 
@@ -233,7 +239,6 @@ class BoardControllerImplTest {
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON));
-//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     ResultActions makeGetResultActions(String url) throws Exception {

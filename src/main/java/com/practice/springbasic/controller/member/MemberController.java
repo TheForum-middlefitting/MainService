@@ -14,9 +14,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
-import static com.practice.springbasic.config.error.ErrorMessage.PasswordEmpty;
-import static com.practice.springbasic.config.error.ErrorMessage.PasswordLen;
-
 public interface MemberController {
     ResponseEntity<ResponseMemberForm> joinMember(HttpServletResponse response, @Valid RequestMemberForm requestUserForm, BindingResult bindingResult);
 
@@ -28,11 +25,11 @@ public interface MemberController {
     ResponseEntity<SuccessReturnForm> deleteMember(
             HttpServletRequest request,
             Long memberId,
-            @NotEmpty(message = PasswordEmpty)
-            @Length(min=10, max=20, message = PasswordLen)
+            @NotEmpty(message = "PasswordEmpty")
+            @Length(min=10, max=20, message = "PasswordLen")
             String password);
 
-    ResponseEntity<SuccessReturnForm> nicknameDuplicateCheck(@NotEmpty @Length(min=4, max=20, message = "닉네임은 4자에서 20자 사이로 입력하세요!") String nickname);
+    ResponseEntity<SuccessReturnForm> nicknameDuplicateCheck(@NotEmpty(message = "NicknameEmpty") @Length(min=4, max=20, message = "NicknameLen") String nickname);
 
-    ResponseEntity<SuccessReturnForm> emailDuplicateCheck(@NotEmpty @Email String email);
+    ResponseEntity<SuccessReturnForm> emailDuplicateCheck(@NotEmpty(message = "EmailEmpty") @Email(message = "EmailForm") String email);
 }

@@ -3,32 +3,32 @@ package com.practice.springbasic.controller.comment;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.comment.dto.CommentUpdateDto;
 import com.practice.springbasic.domain.member.Member;
-import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import com.practice.springbasic.repository.comment.dto.CommentPageSearchCondition;
 import com.practice.springbasic.service.board.BoardService;
 import com.practice.springbasic.service.comment.CommentService;
 import com.practice.springbasic.service.comment.dto.CommentDto;
 import com.practice.springbasic.service.member.MemberService;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
-import static com.practice.springbasic.config.error.ErrorMessage.Forbidden;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -50,11 +50,16 @@ class CommentControllerImplTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    JwtUtils jwtUtils;
+
+    @Autowired
+    Environment env;
+
     private Member member;
     private Board board;
     private Comment comment;
     private CommentDto commentDto;
-
     private CommentUpdateDto commentUpdateDto;
     private Comment updatedComment;
 
@@ -76,9 +81,9 @@ class CommentControllerImplTest {
         when(commentService.postComment(any(Member.class), any(Board.class), any(CommentDto.class))).thenReturn(comment);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
         String content = objectMapper.writeValueAsString(commentDto);
 
         ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, jwtToken);
@@ -89,6 +94,30 @@ class CommentControllerImplTest {
                 .andExpect(jsonPath("$.content").value(comment.getContent()))
                 .andExpect(jsonPath("$.nickname").value(comment.getMember().getNickname()))
                 .andExpect(jsonPath("$.email").value(comment.getMember().getEmail()));
+    }
+
+    @Test
+    @DisplayName("postCommentFailedByContentLen")
+    void postCommentFailedByContentLen() throws Exception {
+        String content = objectMapper.writeValueAsString(new CommentDto("hello"));
+        ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, "");
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(env.getProperty("CommentContentLen.code")))
+                .andExpect(jsonPath("$.message").value(env.getProperty("CommentContentLen.msg")))
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    @DisplayName("postCommentFailedByContentEmpty")
+    void postCommentFailedByContentEmpty() throws Exception {
+        String content = objectMapper.writeValueAsString(new CommentDto(null));
+        ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, "");
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(env.getProperty("CommentContentEmpty.code")))
+                .andExpect(jsonPath("$.message").value(env.getProperty("CommentContentEmpty.msg")))
+                .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
@@ -113,9 +142,9 @@ class CommentControllerImplTest {
         when(commentService.updateComment(any(Comment.class), any(CommentUpdateDto.class))).thenReturn(updatedComment);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         String content = objectMapper.writeValueAsString(commentDto);
 
@@ -135,18 +164,18 @@ class CommentControllerImplTest {
         when(commentService.updateComment(any(Comment.class), any(CommentUpdateDto.class))).thenReturn(updatedComment);
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         String content = objectMapper.writeValueAsString(commentDto);
 
         ResultActions resultActions = makePutResultActions("/comment-service/boards/1/comments/1", content, jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo(Forbidden.split("@")[1])))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("Forbidden.msg"))))))
                 .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo(Forbidden.split("@")[0])));
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("Forbidden.code"))))));
     }
 
     @Test
@@ -155,9 +184,9 @@ class CommentControllerImplTest {
         when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
@@ -172,16 +201,16 @@ class CommentControllerImplTest {
         when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
         resultActions
-                .andExpect(jsonPath("$.message", equalTo(Forbidden.split("@")[1])))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("Forbidden.msg"))))))
                 .andExpect(jsonPath("$.status").value(403))
-                .andExpect(jsonPath("$.code", equalTo(Forbidden.split("@")[0])));
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("Forbidden.code"))))));
     }
     @Test
     @DisplayName("findCommentPageSuccess")
@@ -190,9 +219,9 @@ class CommentControllerImplTest {
         String content = objectMapper.writeValueAsString(condition);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments/next/", content, jwtToken);
 

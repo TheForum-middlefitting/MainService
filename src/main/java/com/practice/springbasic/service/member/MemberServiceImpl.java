@@ -3,8 +3,7 @@ package com.practice.springbasic.service.member;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.repository.member.MemberJpaRepository;
 import com.practice.springbasic.service.member.dto.MemberDto;
-import com.practice.springbasic.utils.cheak.CommonCheckUtil;
-import com.practice.springbasic.utils.error.errorCode.ErrorCode;
+import com.practice.springbasic.utils.check.CommonCheckUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.practice.springbasic.config.error.ErrorMessage.LoginFailedByWrongInput;
-import static com.practice.springbasic.config.error.ErrorMessage.PasswordWrong;
 
 @Transactional
 @Service
@@ -46,8 +43,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Optional<Member> findMemberByEmailAndPassword(String email, String password) {
         Optional<Member> member = memberRepository.findByEmail(email);
-        CommonCheckUtil.nullCheck400(member.orElse(null), LoginFailedByWrongInput);
-        CommonCheckUtil.booleanCheck400(passwordEncoder.matches(password, member.orElse(null).getPassword()), LoginFailedByWrongInput);
+        CommonCheckUtil.nullCheck400(member.orElse(null), "LoginFailedByWrongInput");
+        CommonCheckUtil.booleanCheck400(passwordEncoder.matches(password, member.orElse(null).getPassword()), "LoginFailedByWrongInput");
         return member;
 //        return memberRepository.findByEmailAndPassword(email, password);
     }
@@ -65,8 +62,8 @@ public class MemberServiceImpl implements MemberService {
 //        CommonCheckUtil.nullCheck400(member, PasswordWrong);
 
         Member member = memberRepository.findById(memberId).orElse(null);
-        CommonCheckUtil.nullCheck400(member, LoginFailedByWrongInput);
-        CommonCheckUtil.booleanCheck400(passwordEncoder.matches(password, member.getPassword()), PasswordWrong);
+        CommonCheckUtil.nullCheck400(member, "LoginFailedByWrongInput");
+        CommonCheckUtil.booleanCheck400(passwordEncoder.matches(password, member.getPassword()), "PasswordWrong");
         memberRepository.delete(member);
     }
 
