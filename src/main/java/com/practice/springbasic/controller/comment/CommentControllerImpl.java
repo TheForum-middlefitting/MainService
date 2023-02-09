@@ -1,6 +1,5 @@
 package com.practice.springbasic.controller.comment;
 
-import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.controller.comment.dto.ReturnSingleCommentForm;
 import com.practice.springbasic.controller.utils.check.CheckUtil;
 import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
@@ -16,6 +15,7 @@ import com.practice.springbasic.service.comment.dto.CommentDto;
 import com.practice.springbasic.service.member.MemberService;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -37,19 +37,21 @@ public class CommentControllerImpl implements CommentController{
     private final CommentService commentService;
     private final ModelMapper modelMapper;
     private final JwtUtils jwtUtils;
+    private final Environment env;
 
-    public CommentControllerImpl(BoardService boardService, MemberService memberService, CommentService commentService, ModelMapper modelMapper, JwtUtils jwtUtils) {
+    public CommentControllerImpl(BoardService boardService, MemberService memberService, CommentService commentService, ModelMapper modelMapper, JwtUtils jwtUtils, Environment env) {
         this.boardService = boardService;
         this.memberService = memberService;
         this.commentService = commentService;
         this.modelMapper = modelMapper;
         this.jwtUtils = jwtUtils;
+        this.env = env;
     }
 
     @Override
     @PostMapping("/boards/{boardId}/comments")
     public ResponseEntity<ReturnSingleCommentForm> postComment(HttpServletRequest request, @PathVariable Long boardId, @RequestBody CommentDto commentDto, BindingResult bindingResult) {
-        Long memberId = jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
+        Long memberId = jwtUtils.verifyJwtToken(request, env.getProperty("token.ACCESS_HEADER_STRING"));
         Member member = memberService.findMemberById(memberId).orElse(null);
         Board board = boardService.findBoard(boardId).orElse(null);
         CheckUtil.nullCheck(member);
@@ -69,8 +71,8 @@ public class CommentControllerImpl implements CommentController{
     @Override
     @PutMapping("/boards/{boardId}/comments/{commentId}")
     public ResponseEntity<ReturnSingleCommentForm> updateComment(HttpServletRequest request,@PathVariable Long boardId, @RequestBody CommentUpdateDto commentUpdateDto, @PathVariable Long commentId, BindingResult bindingResult) {
-        jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
-        String email = jwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtToken(request, env.getProperty("token.ACCESS_HEADER_STRING"));
+        String email = jwtUtils.getTokenEmail(request, env.getProperty("token.ACCESS_HEADER_STRING"));
         Comment preComment = commentService.findComment(commentId).orElse(null);
         CheckUtil.nullCheck(preComment);
         memberEmailAndCommentEmailSameCheck(email, preComment);
@@ -82,8 +84,8 @@ public class CommentControllerImpl implements CommentController{
     @Override
     @DeleteMapping("/boards/{boardId}/comments/{commentId}")
     public ResponseEntity<SuccessReturnForm> deleteComment(HttpServletRequest request,@PathVariable Long boardId, @PathVariable Long commentId) {
-        jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
-        String email = jwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtToken(request, env.getProperty("token.ACCESS_HEADER_STRING"));
+        String email = jwtUtils.getTokenEmail(request, env.getProperty("token.ACCESS_HEADER_STRING"));
         Comment comment = commentService.findComment(commentId).orElse(null);
         CheckUtil.nullCheck(comment);
         memberEmailAndCommentEmailSameCheck(email, comment);

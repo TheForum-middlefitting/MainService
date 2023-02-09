@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 
 import java.util.Date;
 
@@ -24,17 +25,19 @@ class JwtUtilsTest {
     @Autowired
     JwtUtils jwtUtils;
 
-    //.withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+    @Autowired
+    Environment env;
+
     @BeforeEach
     public void initialize() {
-        accessToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Access_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        accessToken2 = tokenExample("middlefitting@gmail.com", null, JwtProperties.Access_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
+        accessToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.ACCESS_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        accessToken2 = tokenExample("middlefitting@gmail.com", null, env.getProperty("token.ACCESS_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
 
-        refreshToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        refreshToken2 = tokenExample("middlefitting@gmail.com", null, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
+        refreshToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        refreshToken2 = tokenExample("middlefitting@gmail.com", null, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
 
-        secretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        expireToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() - 60000));
+        secretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        expireToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() - 60000));
     }
 
     @Test

@@ -2,7 +2,6 @@ package com.practice.springbasic.controller.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,17 +41,17 @@ class JwtControllerImplTest {
 
     @BeforeEach
     public void initialize() {
-        accessToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Access_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        accessToken2 = tokenExample("middlefitting@gmail.com", null, JwtProperties.Access_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
+        accessToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.ACCESS_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        accessToken2 = tokenExample("middlefitting@gmail.com", null, env.getProperty("token.ACCESS_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
 
-        refreshToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        refreshToken2 = tokenExample("middlefitting@gmail.com", null, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
+        refreshToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        refreshToken2 = tokenExample("middlefitting@gmail.com", null, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
 
-        accessSecretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        accessExpireToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Access_SECRET, new Date(System.currentTimeMillis() - 60000));
+        accessSecretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        accessExpireToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.ACCESS_SECRET"), new Date(System.currentTimeMillis() - 60000));
 
-        refreshSecretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        refreshExpireToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() - 60000));
+        refreshSecretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        refreshExpireToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() - 60000));
     }
 
     @Test
@@ -64,17 +63,6 @@ class JwtControllerImplTest {
                 .andExpect(jsonPath("$.message", equalTo("success")))
                 .andExpect(jsonPath("$.status").value(200));
     }
-
-//    @Test
-//    public void updateAccessTokenFailedByNotExpired() throws Exception{
-//        ResultActions resultActions = makeResultActions("/tokens/1", accessToken, refreshToken);
-//        resultActions
-//                .andExpect(status().isBadRequest())
-//                .andExpect(header().doesNotExist("Authorization"))
-//                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-//                .andExpect(jsonPath("$.message", equalTo("토큰이 아직 만료되지 않았습니다!")))
-//                .andExpect(jsonPath("$.status").value(400));
-//    }
 
     @Test
     public void updateAccessTokenFailedByBothExpired() throws Exception{

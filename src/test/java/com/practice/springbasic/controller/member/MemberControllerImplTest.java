@@ -3,7 +3,6 @@ package com.practice.springbasic.controller.member;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.controller.member.vo.RequestLoginMemberForm;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.service.member.MemberService;
@@ -42,9 +41,6 @@ class MemberControllerImplTest {
     MemberService memberService;
 
     @Autowired
-    Environment env;
-
-    @Autowired
     ModelMapper modelMapper;
 
     @Autowired
@@ -56,6 +52,9 @@ class MemberControllerImplTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    Environment env;
+
     private Member member;
     private Member FailedEmailParsingMember;
     private Member FailedPasswordParsingMember;
@@ -64,7 +63,7 @@ class MemberControllerImplTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        memberController = new MemberControllerImpl(memberService, modelMapper, jwtUtils);
+        memberController = new MemberControllerImpl(memberService, modelMapper, jwtUtils, env);
     }
     @BeforeEach
     public void createMember() {
@@ -209,9 +208,9 @@ class MemberControllerImplTest {
         when(memberService.findMemberById(1L)).thenReturn(Optional.ofNullable(member));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeGetResultActions("/member-service/members/1", jwtToken);
 
@@ -228,9 +227,9 @@ class MemberControllerImplTest {
         when(memberService.findMemberById(1L)).thenReturn(Optional.ofNullable(member));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 2)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeGetResultActions("/member-service/members/1", jwtToken);
 
@@ -247,9 +246,9 @@ class MemberControllerImplTest {
         when(memberService.findMemberById(2L)).thenReturn(Optional.empty());
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 2)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeGetResultActions("/member-service/members/2", jwtToken);
 
@@ -267,16 +266,14 @@ class MemberControllerImplTest {
         String content = objectMapper.writeValueAsString(member);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makePutResultActions("/member-service/members/1", content, jwtToken);
 
         resultActions
                 .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.message", equalTo("success")))
-//                .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.memberId").value(member.getId()))
                 .andExpect(jsonPath("$.memberId", equalTo(null)))
                 .andExpect(jsonPath("$.nickname").value(member.getNickname()))
@@ -299,12 +296,11 @@ class MemberControllerImplTest {
 
     @Test
     public void deleteMemberSuccess() throws Exception {
-//        when(memberService.findMemberByIdAndPassword(1L, member.getPassword())).thenReturn(Optional.ofNullable(member));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
         ResultActions resultActions = makeDeleteResultActions("/member-service/members/1?password=%middlefitting", jwtToken);
 
         resultActions

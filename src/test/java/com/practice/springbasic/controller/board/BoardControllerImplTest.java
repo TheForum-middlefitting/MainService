@@ -3,7 +3,6 @@ package com.practice.springbasic.controller.board;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
@@ -77,9 +76,9 @@ class BoardControllerImplTest {
         when(boardService.postBoard(any(Member.class), any(BoardDto.class))).thenReturn(board);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
         String content = objectMapper.writeValueAsString(boardDto);
 
         ResultActions resultActions = makePostResultActions("/board-service/boards", content, jwtToken);
@@ -118,9 +117,9 @@ class BoardControllerImplTest {
         when(boardService.updateBoard(any(Board.class), any(BoardDto.class))).thenReturn(updatedBoard);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         String content = objectMapper.writeValueAsString(boardDto);
 
@@ -143,9 +142,9 @@ class BoardControllerImplTest {
         when(boardService.updateBoard(any(Board.class), any(BoardDto.class))).thenReturn(updatedBoard);
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         String content = objectMapper.writeValueAsString(boardDto);
 
@@ -164,9 +163,9 @@ class BoardControllerImplTest {
         when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeDeleteResultActions("/board-service/boards/1", jwtToken);
 
@@ -181,9 +180,9 @@ class BoardControllerImplTest {
         when(boardService.findBoard(1L)).thenReturn(Optional.ofNullable(board));
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeDeleteResultActions("/board-service/boards/1", jwtToken);
 
@@ -200,9 +199,9 @@ class BoardControllerImplTest {
         String content = objectMapper.writeValueAsString(condition);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makePostResultActions("/board-service/boards/offset/", content, jwtToken);
 
@@ -240,7 +239,6 @@ class BoardControllerImplTest {
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON));
-//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     ResultActions makeGetResultActions(String url) throws Exception {

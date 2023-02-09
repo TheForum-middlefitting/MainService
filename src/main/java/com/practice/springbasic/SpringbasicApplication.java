@@ -30,7 +30,6 @@ public class SpringbasicApplication {
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 	@Bean
 	public JwtUtils jwtUtils() {
 		return new JwtUtils();

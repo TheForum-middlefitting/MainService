@@ -1,6 +1,5 @@
 package com.practice.springbasic.controller.board;
 
-import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.controller.board.vo.RequestBoardForm;
 import com.practice.springbasic.controller.board.vo.ResponseBoardForm;
 import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
@@ -54,7 +53,7 @@ public class BoardControllerImpl implements BoardController{
             @RequestBody RequestBoardForm boardForm,
             BindingResult bindingResult
             ) {
-        Long memberId = jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
+        Long memberId = jwtUtils.verifyJwtToken(request, env.getProperty("token.ACCESS_HEADER_STRING"));
         Member member = memberService.findMemberById(memberId).orElse(null);
         CommonCheckUtil.nullCheck400(member, "AuthFailed");
         BoardDto boardDto = modelMapper.map(boardForm, BoardDto.class);
@@ -78,8 +77,8 @@ public class BoardControllerImpl implements BoardController{
              @PathVariable Long boardId,
              BindingResult bindingResult
             ) {
-        jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
-        String email = jwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtToken(request, env.getProperty("token.ACCESS_HEADER_STRING"));
+        String email = jwtUtils.getTokenEmail(request, env.getProperty("token.ACCESS_HEADER_STRING"));
         Board board = boardService.findBoard(boardId).orElse(null);
         CommonCheckUtil.nullCheck404(board, "BoardNotFound");
         CommonCheckUtil.equalCheck401(email, board.getMember().getEmail(), "AuthFailed");
@@ -91,8 +90,8 @@ public class BoardControllerImpl implements BoardController{
     @Override
     @DeleteMapping("boards/{boardId}")
     public ResponseEntity<SuccessReturnForm> deleteBoard(HttpServletRequest request, @PathVariable Long boardId) {
-        jwtUtils.verifyJwtToken(request, JwtProperties.ACCESS_HEADER_STRING);
-        String email = jwtUtils.getTokenEmail(request, JwtProperties.ACCESS_HEADER_STRING);
+        jwtUtils.verifyJwtToken(request, env.getProperty("token.ACCESS_HEADER_STRING"));
+        String email = jwtUtils.getTokenEmail(request, env.getProperty("token.ACCESS_HEADER_STRING"));
         Board board = boardService.findBoard(boardId).orElse(null);
         CommonCheckUtil.nullCheck404(board, "BoardNotFound");
         CommonCheckUtil.equalCheck401(email, board.getMember().getEmail(), "AuthFailed");

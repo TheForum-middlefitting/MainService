@@ -3,7 +3,6 @@ package com.practice.springbasic.controller.comment;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.springbasic.config.jwt.JwtProperties;
 import com.practice.springbasic.domain.board.Board;
 import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.comment.Comment;
@@ -82,9 +81,9 @@ class CommentControllerImplTest {
         when(commentService.postComment(any(Member.class), any(Board.class), any(CommentDto.class))).thenReturn(comment);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
         String content = objectMapper.writeValueAsString(commentDto);
 
         ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments", content, jwtToken);
@@ -143,9 +142,9 @@ class CommentControllerImplTest {
         when(commentService.updateComment(any(Comment.class), any(CommentUpdateDto.class))).thenReturn(updatedComment);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         String content = objectMapper.writeValueAsString(commentDto);
 
@@ -165,9 +164,9 @@ class CommentControllerImplTest {
         when(commentService.updateComment(any(Comment.class), any(CommentUpdateDto.class))).thenReturn(updatedComment);
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         String content = objectMapper.writeValueAsString(commentDto);
 
@@ -185,9 +184,9 @@ class CommentControllerImplTest {
         when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
@@ -202,9 +201,9 @@ class CommentControllerImplTest {
         when(commentService.findComment(1L)).thenReturn(Optional.ofNullable(comment));
         String jwtToken = JWT.create()
                 .withSubject("Different" + member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makeDeleteResultActions("/comment-service/boards/1/comments/1", jwtToken);
 
@@ -220,9 +219,9 @@ class CommentControllerImplTest {
         String content = objectMapper.writeValueAsString(condition);
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
                 .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(JwtProperties.Access_SECRET));
+                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
 
         ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments/next/", content, jwtToken);
 
