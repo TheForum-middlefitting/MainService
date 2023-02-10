@@ -14,6 +14,7 @@ import com.practice.springbasic.service.comment.CommentService;
 import com.practice.springbasic.service.comment.dto.CommentDto;
 import com.practice.springbasic.service.member.MemberService;
 import com.practice.springbasic.utils.jwt.JwtUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/comment-service")
 @Validated
+@Slf4j
 public class CommentControllerImpl implements CommentController{
     private final BoardService boardService;
     private final MemberService memberService;
@@ -92,13 +94,24 @@ public class CommentControllerImpl implements CommentController{
         commentService.deleteComment(comment);
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessReturnForm(200));
     }
+
     @Override
-    @PostMapping("/boards/{boardId}/comments/next/")
-    public ResponseEntity<Page<CommentPageDto>> searchCommentPage(@PageableDefault(page = 0, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                           @PathVariable Long boardId, @RequestBody @Validated CommentPageSearchCondition condition, BindingResult bindingResult) {
+    @GetMapping("/boards/{boardId}/comments")
+    public ResponseEntity<Page<CommentPageDto>> searchCommentPage
+            (
+                    @PageableDefault(page = 0, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+                    @PathVariable Long boardId,
+                    @RequestParam(name = "commentId", required = false) Long commentId
+            )
+    {
+        CommentPageSearchCondition condition = CommentPageSearchCondition
+                .builder()
+                .commentId(commentId)
+                .build();
         Page<CommentPageDto> commentPage = commentService.findCommentPage(pageable, condition, boardId);
         return ResponseEntity.status(HttpStatus.OK).body(commentPage);
     }
+
     private static void memberEmailAndCommentEmailSameCheck(String email, Comment comment) {
         if(!email.equals(comment.getMember().getEmail())) {
             throw new RuntimeException("정상적이지 않은 접근");
