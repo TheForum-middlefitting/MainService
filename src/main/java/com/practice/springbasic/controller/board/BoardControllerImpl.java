@@ -4,6 +4,7 @@ import com.practice.springbasic.controller.board.vo.RequestBoardForm;
 import com.practice.springbasic.controller.board.vo.ResponseBoardForm;
 import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
 import com.practice.springbasic.domain.board.Board;
+import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.repository.board.dto.BoardPageDto;
 import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
@@ -88,7 +89,7 @@ public class BoardControllerImpl implements BoardController{
     }
 
     @Override
-    @DeleteMapping("boards/{boardId}")
+    @DeleteMapping("/boards/{boardId}")
     public ResponseEntity<SuccessReturnForm> deleteBoard(HttpServletRequest request, @PathVariable Long boardId) {
         jwtUtils.verifyJwtToken(request, env.getProperty("token.ACCESS_HEADER_STRING"));
         String email = jwtUtils.getTokenEmail(request, env.getProperty("token.ACCESS_HEADER_STRING"));
@@ -100,13 +101,23 @@ public class BoardControllerImpl implements BoardController{
     }
 
     @Override
-    @PostMapping("boards/offset/")
+    @GetMapping("/boards")
     public ResponseEntity<Page<BoardPageDto>> searchBoardPage
             (
             @PageableDefault(page = 0, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestBody BoardPageSearchCondition condition,
-            BindingResult bindingResult
-            ) {
+            @RequestParam(name = "boardWriterNickname", required = false) String boardWriterNickname,
+            @RequestParam(name = "boardTitle", required = false) String boardTitle,
+            @RequestParam(name = "boardContent", required = false) String boardContent,
+            @RequestParam(name = "boardCategory", defaultValue = "free", required = false) BoardCategory boardCategory
+            )
+    {
+        BoardPageSearchCondition condition = BoardPageSearchCondition
+                .builder()
+                .boardWriterNickname(boardWriterNickname)
+                .boardTitle(boardTitle)
+                .boardContent(boardContent)
+                .boardCategory(boardCategory)
+                .build();
         Page<BoardPageDto> boardPage = boardService.findBoardPage(pageable, condition);
         return ResponseEntity.status(HttpStatus.OK).body(boardPage);
     }

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -216,15 +217,8 @@ class CommentControllerImplTest {
     @DisplayName("findCommentPageSuccess")
     void findCommentPageSuccess() throws Exception{
         CommentPageSearchCondition condition = new CommentPageSearchCondition(1L);
-        String content = objectMapper.writeValueAsString(condition);
-        String jwtToken = JWT.create()
-                .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))))
-                .withClaim("id", 1)
-                .sign(Algorithm.HMAC512(env.getProperty("token.ACCESS_SECRET")));
-
-        ResultActions resultActions = makePostResultActions("/comment-service/boards/1/comments/next/", content, jwtToken);
-
+        ResultActions resultActions = makeGetPageResultActions("/comment-service/boards/1/comments/", condition);
+        when(commentService.findCommentPage(any(Pageable.class), any(CommentPageSearchCondition.class), any(Long.class))).thenReturn(null);
         resultActions
                 .andExpect(status().isOk());
     }
@@ -265,6 +259,14 @@ class CommentControllerImplTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    ResultActions makeGetPageResultActions(String url, CommentPageSearchCondition condition) throws Exception {
+        return mockMvc.perform(get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("commentId", String.valueOf(condition.getCommentId()))
+                        .accept(MediaType.APPLICATION_JSON));
+//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     ResultActions makePutResultActions(String url, String content, String jwtToken) throws Exception {

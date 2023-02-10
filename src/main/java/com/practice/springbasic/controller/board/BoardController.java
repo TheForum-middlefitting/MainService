@@ -2,12 +2,9 @@ package com.practice.springbasic.controller.board;
 
 import com.practice.springbasic.controller.board.vo.RequestBoardForm;
 import com.practice.springbasic.controller.board.vo.ResponseBoardForm;
-import com.practice.springbasic.controller.utils.form.SuccessResult;
 import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
-import com.practice.springbasic.domain.board.Board;
-import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
+import com.practice.springbasic.domain.board.BoardCategory;
 import com.practice.springbasic.repository.board.dto.BoardPageDto;
-import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.NumberFormat;
@@ -26,5 +23,10 @@ public interface BoardController {
 
     ResponseEntity<SuccessReturnForm> deleteBoard(HttpServletRequest request, Long boardId);
 
-    ResponseEntity<Page<BoardPageDto>> searchBoardPage(Pageable pageable, @Valid BoardPageSearchCondition condition, BindingResult bindingResult);
+//    ResponseEntity<Page<BoardPageDto>> searchBoardPage(Pageable pageable, @Valid BoardPageSearchCondition condition, BindingResult bindingResult);
+    ResponseEntity<Page<BoardPageDto>> searchBoardPage(Pageable pageable,
+                                                       String boardWriterNickname,
+                                                       String boardTitle,
+                                                       String boardContent,
+                                                       BoardCategory boardCategory);
 }
