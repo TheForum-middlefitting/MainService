@@ -2,18 +2,19 @@ package com.practice.springbasic.controller.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.practice.springbasic.config.jwt.JwtProperties;
+import com.practice.springbasic.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Date;
+import java.util.Objects;
 
-import static com.practice.springbasic.config.error.ErrorMessage.AuthFailed;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -23,6 +24,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class JwtControllerImplTest {
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    Environment env;
+
+    @Autowired
+    JwtUtils jwtUtils;
     String accessToken;
     String refreshToken;
     String accessToken2;
@@ -34,17 +41,17 @@ class JwtControllerImplTest {
 
     @BeforeEach
     public void initialize() {
-        accessToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Access_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        accessToken2 = tokenExample("middlefitting@gmail.com", null, JwtProperties.Access_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
+        accessToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.ACCESS_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        accessToken2 = tokenExample("middlefitting@gmail.com", null, env.getProperty("token.ACCESS_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
 
-        refreshToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        refreshToken2 = tokenExample("middlefitting@gmail.com", null, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
+        refreshToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        refreshToken2 = tokenExample("middlefitting@gmail.com", null, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
 
-        accessSecretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        accessExpireToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Access_SECRET, new Date(System.currentTimeMillis() - 60000));
+        accessSecretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        accessExpireToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.ACCESS_SECRET"), new Date(System.currentTimeMillis() - 60000));
 
-        refreshSecretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME));
-        refreshExpireToken = tokenExample("middlefitting@gmail.com", 1L, JwtProperties.Refresh_SECRET, new Date(System.currentTimeMillis() - 60000));
+        refreshSecretFailToken = tokenExample("middlefitting@gmail.com", 1L, "helloWorld!", new Date(System.currentTimeMillis() + Integer.parseInt(env.getProperty("token.ACCESS_EXPIRATION_TIME"))));
+        refreshExpireToken = tokenExample("middlefitting@gmail.com", 1L, env.getProperty("token.REFRESH_SECRET"), new Date(System.currentTimeMillis() - 60000));
     }
 
     @Test
@@ -57,25 +64,14 @@ class JwtControllerImplTest {
                 .andExpect(jsonPath("$.status").value(200));
     }
 
-//    @Test
-//    public void updateAccessTokenFailedByNotExpired() throws Exception{
-//        ResultActions resultActions = makeResultActions("/tokens/1", accessToken, refreshToken);
-//        resultActions
-//                .andExpect(status().isBadRequest())
-//                .andExpect(header().doesNotExist("Authorization"))
-//                .andExpect(jsonPath("$.code", equalTo("BAD_REQUEST")))
-//                .andExpect(jsonPath("$.message", equalTo("토큰이 아직 만료되지 않았습니다!")))
-//                .andExpect(jsonPath("$.status").value(400));
-//    }
-
     @Test
     public void updateAccessTokenFailedByBothExpired() throws Exception{
         ResultActions resultActions = makeResultActions("/member-service/tokens/1", accessExpireToken, refreshExpireToken);
         resultActions
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().doesNotExist("Authorization"))
-                .andExpect(jsonPath("$.code", equalTo("UNAUTHORIZED")))
-                .andExpect(jsonPath("$.message", equalTo("만료된 토큰")))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("TokenExpired.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("TokenExpired.msg"))))))
                 .andExpect(jsonPath("$.status").value(401));
     }
 
@@ -85,8 +81,8 @@ class JwtControllerImplTest {
         resultActions
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().doesNotExist("Authorization"))
-                .andExpect(jsonPath("$.code", equalTo(AuthFailed.split("@")[0])))
-                .andExpect(jsonPath("$.message", equalTo(AuthFailed.split("@")[1])))
+                .andExpect(jsonPath("$.code", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.code"))))))
+                .andExpect(jsonPath("$.message", equalTo(String.format(Objects.requireNonNull(env.getProperty("AuthFailed.msg"))))))
                 .andExpect(jsonPath("$.status").value(401));
     }
 

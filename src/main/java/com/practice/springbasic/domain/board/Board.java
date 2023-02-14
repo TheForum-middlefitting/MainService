@@ -5,6 +5,7 @@ import com.practice.springbasic.domain.base.BaseEntity;
 import com.practice.springbasic.domain.comment.Comment;
 import com.practice.springbasic.domain.member.Member;
 import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
+import com.practice.springbasic.service.board.dto.BoardDto;
 import com.sun.istack.NotNull;
 import lombok.*;
 
@@ -55,7 +56,7 @@ public class Board extends BaseConstructorEntity {
         this.member = member;
     }
 
-    public void boardUpdate(BoardUpdateDto boardUpdateDto) {
+    public void boardUpdate(BoardDto boardUpdateDto) {
         this.boardCategory = boardUpdateDto.getBoardCategory();
         this.title = boardUpdateDto.getTitle();
         this.content = boardUpdateDto.getContent();

@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -33,10 +34,13 @@ class MemberServiceImplTest {
 //    @InjectMocks
     MemberServiceImpl memberService;
 
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        memberService = new MemberServiceImpl(memberRepository, modelMapper);
+        memberService = new MemberServiceImpl(memberRepository, modelMapper, passwordEncoder);
     }
     private Member member;
     private MemberDto memberDto;
@@ -57,7 +61,8 @@ class MemberServiceImplTest {
 
         Member result = memberService.join(memberDto);
 
-        assertThat(result.getPassword()).isEqualTo(memberDto.getPassword());
+        assertThat(result.getPassword()).isNotEqualTo(memberDto.getPassword());
+
         assertThat(result.getNickname()).isEqualTo(memberDto.getNickname());
         assertThat(result.getEmail()).isEqualTo(memberDto.getEmail());
 
@@ -65,18 +70,22 @@ class MemberServiceImplTest {
 
     @Test
     public void findMemberSuccess() {
-        when(memberRepository.findByEmailAndPassword(member.getEmail(), member.getPassword())).thenReturn(Optional.of(member));
+//        when(memberRepository.findByEmailAndPassword(member.getEmail(), member.getPassword())).thenReturn(Optional.of(member));
+//        Optional<Member> member = memberRepository.findByEmail(email);
+        when(memberRepository.findByEmail(member.getEmail())).thenReturn(Optional.of(member));
 
-        Member result = memberService.findMemberByEmailAndPassword(member.getEmail(), member.getPassword()).orElse(null);
+//        Member result = memberService.findMemberByEmailAndPassword(member.getEmail(), member.getPassword()).orElse(null);
+        Member result = memberService.findMemberByEmailAndPassword(member.getEmail(), "%middlefitting").orElse(null);
+
 
         assertThat(result).isEqualTo(member);
     }
 
     @Test
     public void findMemberFailed() {
-        Member result = memberService.findMemberByEmailAndPassword(member.getNickname(), member.getPassword()).orElse(null);
-
-        assertThat(result).isEqualTo(null);
+//        Member result = memberService.findMemberByEmailAndPassword(member.getNickname(), member.getPassword()).orElse(null);
+//        assertThat(result).isEqualTo(null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> memberService.findMemberByEmailAndPassword(member.getNickname(), member.getPassword()));
     }
 
     @Test
@@ -90,8 +99,9 @@ class MemberServiceImplTest {
 
     @Test
     public void withdrawalMemberSuccess() {
-        when(memberRepository.findByIdAndPassword(null, member.getPassword())).thenReturn(Optional.ofNullable(member));
-        memberService.withdrawal(member.getId(), member.getPassword());
+//        when(memberRepository.findByIdAndPassword(null, member.getPassword())).thenReturn(Optional.ofNullable(member));
+        when(memberRepository.findById(null)).thenReturn(Optional.ofNullable(member));
+        memberService.withdrawal(member.getId(), "%middlefitting");
     }
 
     @Test
@@ -174,7 +184,8 @@ class MemberServiceImplTest {
     private Member memberSample() {
         return Member.builder()
                 .email("middlefitting@google.com")
-                .password("%middlefitting")
+//                .password("%middlefitting")
+                .password(passwordEncoder.encode("%middlefitting"))
                 .nickname("middlefitting")
                 .build();
     }
@@ -182,7 +193,8 @@ class MemberServiceImplTest {
     private MemberDto memberDtoExistSample() {
         return MemberDto.builder()
                 .email("middlefitting@google.com")
-                .password("%middlefitting")
+//                .password("%middlefitting"
+                .password(passwordEncoder.encode("%middlefitting"))
                 .nickname("middlefitting")
                 .build();
     }

@@ -30,7 +30,7 @@ public class Member extends BaseEntity {
     @NotNull @NotEmpty @Email
     @Column(unique = true)
     private String  email;
-    @NotNull @NotEmpty @Length(min=10, max=20)
+    @NotNull @NotEmpty @Length(min=10)
     private String  password;
 
     @OneToMany(mappedBy = "member", orphanRemoval = true)

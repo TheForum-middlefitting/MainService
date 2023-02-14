@@ -1,21 +1,32 @@
 package com.practice.springbasic.controller.board;
 
-import com.practice.springbasic.controller.utils.form.SuccessResult;
-import com.practice.springbasic.domain.board.dto.BoardUpdateDto;
-import com.practice.springbasic.repository.board.dto.BoardPageSearchCondition;
-import com.practice.springbasic.service.board.dto.BoardDto;
+import com.practice.springbasic.controller.board.vo.RequestBoardForm;
+import com.practice.springbasic.controller.board.vo.ResponseBoardForm;
+import com.practice.springbasic.controller.utils.form.SuccessReturnForm;
+import com.practice.springbasic.domain.board.BoardCategory;
+import com.practice.springbasic.repository.board.dto.BoardPageDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 public interface BoardController {
-    SuccessResult postBoard(HttpServletRequest request, BoardDto boardDto, BindingResult bindingResult);
+    ResponseEntity<ResponseBoardForm> postBoard(HttpServletRequest request, @Valid RequestBoardForm boardForm, BindingResult bindingResult);
 
-    SuccessResult getBoard(Long boardId);
+    ResponseEntity<ResponseBoardForm> getBoard(@NumberFormat Long boardId);
 
-    SuccessResult updateBoard(HttpServletRequest request, BoardUpdateDto boardUpdateDto, Long boardId, BindingResult bindingResult);
+    ResponseEntity<ResponseBoardForm> updateBoard(HttpServletRequest request, @Valid RequestBoardForm boardUpdateForm, Long boardId, BindingResult bindingResult);
 
-    SuccessResult deleteBoard(HttpServletRequest request, Long boardId);
-    SuccessResult searchBoardPage(Pageable pageable, BoardPageSearchCondition condition, BindingResult bindingResult);
+    ResponseEntity<SuccessReturnForm> deleteBoard(HttpServletRequest request, Long boardId);
+
+//    ResponseEntity<Page<BoardPageDto>> searchBoardPage(Pageable pageable, @Valid BoardPageSearchCondition condition, BindingResult bindingResult);
+    ResponseEntity<Page<BoardPageDto>> searchBoardPage(Pageable pageable,
+                                                       String boardWriterNickname,
+                                                       String boardTitle,
+                                                       String boardContent,
+                                                       BoardCategory boardCategory);
 }

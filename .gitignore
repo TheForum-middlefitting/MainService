@@ -43,3 +43,6 @@ JwtProperties.java
 *secret.yml
 *secret.properties
 *secret.env
+
+application-env.yml
+Dockerfile
