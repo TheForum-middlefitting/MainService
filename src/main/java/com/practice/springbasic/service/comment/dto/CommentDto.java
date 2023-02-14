@@ -13,6 +13,6 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentDto {
     @NotEmpty(message = "CommentContentEmpty")
-    @Length(min=10, max=20, message = "CommentContentLen")
+    @Length(min=10, max=1000, message = "CommentContentLen")
     private String content;
 }

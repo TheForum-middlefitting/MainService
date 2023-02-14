@@ -45,3 +45,4 @@ JwtProperties.java
 *secret.env
 
 application-env.yml
+Dockerfile
